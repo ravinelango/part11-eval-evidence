@@ -1,0 +1,4 @@
+# SYNTHETIC EXAMPLE config (fingerprinted into the report)
+model: example-model-v1
+temperature: 0
+judge: exact-rubric-v0

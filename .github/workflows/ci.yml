@@ -1,0 +1,20 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      - run: pytest -q
+      - name: Demo (synthetic example)
+        run: |
+          p11e build --results examples/synthetic_run/results.jsonl --requirements examples/synthetic_run/requirements.yaml --out out --operator ci --config examples/synthetic_run/config.yaml
+          p11e verify out/run_log.jsonl
