@@ -90,3 +90,63 @@ def summary_html(md_text: str) -> str:
             "<style>body{font-family:system-ui,sans-serif;max-width:900px;margin:2em auto}"
             "pre{white-space:pre-wrap}</style></head><body><pre>"
             + html.escape(md_text) + "</pre></body></html>")
+
+
+_CSS = (
+    "body{font-family:system-ui,sans-serif;max-width:960px;margin:2em auto;color:#1b1f24}"
+    "table{border-collapse:collapse;width:100%;margin:1em 0}"
+    "th,td{border:1px solid #d0d7de;padding:6px 8px;text-align:left;vertical-align:top}"
+    "th{background:#f6f8fa}code{font-size:.85em;word-break:break-all}"
+    ".banner{background:#fff8c5;border:1px solid #d4a72c;padding:8px 12px}"
+    ".PASS{color:#1a7f37;font-weight:600}.FAIL{color:#cf222e;font-weight:600}"
+    ".NOT.TESTED,.UNTRACED{color:#9a6700;font-weight:600}"
+    ".sign{margin-top:2em;border-top:1px solid #d0d7de;padding-top:1em}"
+    "@media print{body{margin:0}th{background:#eee}}"
+)
+
+
+def _status(s: str) -> str:
+    return f"<span class='{html.escape(s)}'>{html.escape(s)}</span>"
+
+
+def summary_html_report(meta: dict, matrix: list[dict], devs: list[str]) -> str:
+    """Self-contained, print-friendly HTML validation summary (no external assets)."""
+    e = html.escape
+    verdict = "PASS" if all(m["status"] == "PASS" for m in matrix) else "FAIL"
+    meta_rows = [
+        ("Operator", e(str(meta["operator"]))),
+        ("Generated (UTC)", e(str(meta["generated_at"]))),
+        ("Model(s)", e(", ".join(meta["models"]))),
+        ("Config SHA-256", f"<code>{e(meta['config_hash'])}</code>"),
+        ("Results file SHA-256", f"<code>{e(meta['results_hash'])}</code>"),
+        ("Requirements file SHA-256", f"<code>{e(meta['requirements_hash'])}</code>"),
+        ("Run log final hash", f"<code>{e(meta['chain_head'])}</code>"),
+        ("Tests executed", str(meta["n_tests"])),
+    ]
+    parts = [
+        "<!doctype html><html lang='en'><head><meta charset='utf-8'>",
+        f"<title>Validation Summary: {e(meta['run_id'])}</title><style>{_CSS}</style>",
+        "</head><body>",
+        f"<h1>Validation Summary: {e(meta['run_id'])}</h1>",
+    ]
+    if meta.get("label"):
+        parts.append(f"<p class='banner'><strong>{e(meta['label'])}</strong></p>")
+    parts.append("<h2>Run metadata</h2><table>")
+    parts += [f"<tr><th>{k}</th><td>{v}</td></tr>" for k, v in meta_rows]
+    parts.append(f"</table><h2>Overall result: {_status(verdict)}</h2>")
+    parts.append("<h2>Pass/fail by requirement</h2><table><tr><th>Requirement</th>"
+                 "<th>Description</th><th>Risk</th><th>Tests</th><th>Passed</th>"
+                 "<th>Status</th></tr>")
+    for m in matrix:
+        parts.append(
+            f"<tr><td>{e(m['requirement_id'])}</td><td>{e(m['description'])}</td>"
+            f"<td>{e(str(m['risk']))}</td><td>{e(', '.join(m['tests']) or '-')}</td>"
+            f"<td>{m['passed']}/{m['total']}</td><td>{_status(m['status'])}</td></tr>")
+    parts.append("</table><h2>Deviations</h2><ul>")
+    parts += [f"<li>{e(d)}</li>" for d in devs] or ["<li>None</li>"]
+    parts.append(
+        "</ul><div class='sign'><p>Reviewed by: ____________________ "
+        "Date: ____________</p><p><em>Manual sign-off; this tool does not implement Part 11 "
+        f"electronic signatures.</em></p></div><hr><p><small>{e(DISCLAIMER)}</small></p>"
+        "</body></html>")
+    return "\n".join(parts) + "\n"

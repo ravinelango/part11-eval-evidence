@@ -78,3 +78,16 @@ def test_promptfoo_adapter():
     recs = [normalize(r) for r in from_promptfoo(data)]
     assert recs[0]["requirement_id"] == "REQ-9" and recs[0]["verdict"] == "pass"
     assert json.loads(recs[0]["input"]) == {"q": "hi"}
+
+
+def test_html_report_is_structured_and_escaped():
+    from part11_eval_evidence.report import summary_html_report
+
+    meta = {"run_id": "r<1>", "operator": "op", "generated_at": "t", "models": ["m"],
+            "config_hash": "c", "results_hash": "r", "requirements_hash": "q",
+            "chain_head": "h", "n_tests": 1, "label": "SYNTHETIC"}
+    matrix = [{"requirement_id": "R1", "description": "<script>x</script>", "risk": "high",
+               "tests": ["T1"], "passed": 0, "total": 1, "status": "FAIL"}]
+    out = summary_html_report(meta, matrix, ["Test T1 (R1): verdict FAIL"])
+    assert "<table>" in out and "class='FAIL'" in out and "SYNTHETIC" in out
+    assert "<script>x" not in out and "&lt;script&gt;" in out and "r&lt;1&gt;" in out

@@ -64,7 +64,8 @@ def build(results_path, requirements_path, out_dir, operator=None, config_path=N
                                                 encoding="utf-8")
     md = report.summary_markdown(meta, matrix, devs)
     (out / "validation_summary.md").write_text(md, encoding="utf-8")
-    (out / "validation_summary.html").write_text(report.summary_html(md), encoding="utf-8")
+    html_doc = report.summary_html_report(meta, matrix, devs)
+    (out / "validation_summary.html").write_text(html_doc, encoding="utf-8")
 
     manifest = {name: file_hash(out / name) for name in sorted(
         ["run_log.jsonl", "traceability_matrix.csv", "traceability_matrix.md",
