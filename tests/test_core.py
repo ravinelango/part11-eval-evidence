@@ -70,6 +70,30 @@ def test_cli_verify_exit_codes(tmp_path, capsys):
     assert main(["verify", str(log)]) == 1
 
 
+def test_anchor_catches_full_rewrite_and_truncation(tmp_path):
+    p = tmp_path / "log.jsonl"
+    chain.write_chain(chain.build_chain([{"a": 1}, {"b": 2}, {"c": 3}]), p)
+    anchored = chain.read_head(p)
+    assert chain.verify_against_anchor(p, anchored)[0]
+    # A rebuilt chain is internally valid, so only the anchor exposes it.
+    chain.write_chain(chain.build_chain([{"a": 1}, {"b": 99}, {"c": 3}]), p)
+    assert chain.verify_chain(p)[0]
+    ok, probs = chain.verify_against_anchor(p, anchored)
+    assert not ok and any("anchored head" in x for x in probs)
+    # Dropping the last entry also leaves a valid chain with a different head.
+    chain.write_chain(chain.build_chain([{"a": 1}, {"b": 2}]), p)
+    assert not chain.verify_against_anchor(p, anchored)[0]
+
+
+def test_cli_head_and_expect_head(tmp_path, capsys):
+    r = _build(tmp_path)
+    log = str(tmp_path / "run_log.jsonl")
+    assert main(["head", log]) == 0
+    assert capsys.readouterr().out.strip() == r["meta"]["chain_head"]
+    assert main(["verify", log, "--expect-head", r["meta"]["chain_head"].upper()]) == 0
+    assert main(["verify", log, "--expect-head", "0" * 64]) == 1
+
+
 def test_promptfoo_adapter():
     data = {"createdAt": "2026-01-01", "results": {"results": [
         {"vars": {"q": "hi"}, "response": {"output": "hello"}, "success": True, "score": 1,

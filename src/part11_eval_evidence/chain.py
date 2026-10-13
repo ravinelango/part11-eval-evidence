@@ -56,3 +56,30 @@ def verify_chain(path: str | Path) -> tuple[bool, list[str]]:
     if not lines:
         problems.append("log is empty")
     return (not problems, problems)
+
+
+def read_head(path: str | Path) -> str | None:
+    """Return the hash of the last entry (the chain head), or None for an empty log."""
+    lines = Path(path).read_text(encoding="utf-8").splitlines()
+    if not lines:
+        return None
+    try:
+        return json.loads(lines[-1]).get("hash")
+    except json.JSONDecodeError:
+        return None
+
+
+def verify_against_anchor(path: str | Path, expected_head: str) -> tuple[bool, list[str]]:
+    """Verify the chain and compare its head with a hash recorded outside the log.
+
+    A full rewrite of the log produces an internally consistent chain, so
+    `verify_chain` alone passes. Comparing the head with an independently stored
+    copy (ticket, QMS record, signed commit) catches that, and also catches
+    entries truncated from the end.
+    """
+    ok, problems = verify_chain(path)
+    head = read_head(path)
+    expected = expected_head.strip().lower()
+    if head != expected:
+        problems.append(f"chain head {head} does not match anchored head {expected}")
+    return (ok and head == expected, problems)
