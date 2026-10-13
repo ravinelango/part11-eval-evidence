@@ -28,6 +28,8 @@ p11e build --results examples/synthetic_run/results.jsonl \
            --config examples/synthetic_run/config.yaml \
            --operator "your.name" --out out
 p11e verify out/run_log.jsonl          # exit 0 = chain intact, 1 = tamper detected
+p11e head out/run_log.jsonl            # print the chain head to record outside the repo
+p11e verify out/run_log.jsonl --expect-head <recorded-sha256>
 ```
 
 Other inputs: `--format promptfoo` (promptfoo `-o results.json`; put `requirement_id`/`test_id`
@@ -74,7 +76,7 @@ Clause text checked against [eCFR 21 CFR Part 11](https://www.ecfr.gov/current/t
 
 ## Limitations
 
-- **Tamper-evident, not tamper-proof.** Someone who can rewrite the whole log can rebuild the chain. Anchor the chain head somewhere independent (signed commit, ticket, QMS).
+- **Tamper-evident, not tamper-proof.** Someone who can rewrite the whole log can rebuild the chain. Record the chain head somewhere independent (QMS record, ticket, signed tag) and check it with `--expect-head`; see [docs/anchoring.md](docs/anchoring.md).
 - No access control, user authentication, or Part 11 electronic signatures. Sign-off is a manual line.
 - The operator name is self-reported. Timestamps come from the eval harness and the local clock.
 - The tool itself would need validation before you rely on it in a GxP context.
