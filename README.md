@@ -26,6 +26,7 @@ pip install -e ".[dev]"
 p11e build --results examples/synthetic_run/results.jsonl \
            --requirements examples/synthetic_run/requirements.yaml \
            --config examples/synthetic_run/config.yaml \
+           --dispositions examples/synthetic_run/dispositions.yaml \
            --operator "your.name" --out out
 p11e verify out/run_log.jsonl          # exit 0 = chain intact, 1 = tamper detected
 p11e head out/run_log.jsonl            # print the chain head to record outside the repo
@@ -52,13 +53,20 @@ JSONL, one object per line (or a JSON array):
 
 Requirements YAML: `label` (optional banner) and `requirements: [{id, description, risk}]`.
 
+Optional dispositions YAML/JSON (`--dispositions`): records how each known failure or gap was
+handled. Each entry needs `deviation_id`, `description`, `root_cause`,
+`disposition` (`accepted` | `corrected` | `deferred`), `disposition_rationale`, `approver`,
+`approved_at` (ISO 8601), plus `requirement_id` and/or `test_id`. See
+`examples/synthetic_run/dispositions.yaml` (labeled synthetic).
+
 ## Artifacts (`out/`)
 
 | file | purpose |
 |---|---|
 | `run_log.jsonl` | SHA-256 hash-chained events (run start, each result, run end) |
 | `traceability_matrix.csv` / `.md` | requirement → tests → result (PASS / FAIL / NOT TESTED / UNTRACED) |
-| `validation_summary.md` / `.html` | one-page summary: operator, time, models, config hash, results by requirement, deviations, manual review line |
+| `validation_summary.md` / `.html` | one-page summary: operator, time, models, config hash, results by requirement, deviations, dispositions, manual review line |
+| `dispositions.csv` / `.json` | present when `--dispositions` is supplied; root cause, disposition, approver |
 | `manifest.json` | metadata + SHA-256 of every artifact |
 
 ## Part 11 mapping

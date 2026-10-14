@@ -20,6 +20,8 @@ def main(argv=None) -> int:
     b.add_argument("--config", help="eval config file to fingerprint")
     b.add_argument("--format", default="native", choices=["native", "promptfoo", "deepeval"])
     b.add_argument("--run-id")
+    b.add_argument("--dispositions",
+                   help="YAML/JSON deviation disposition file for failed checks")
     v = sub.add_parser("verify", help="verify hash-chained run log")
     v.add_argument("log")
     v.add_argument("--expect-head", metavar="SHA256",
@@ -29,10 +31,12 @@ def main(argv=None) -> int:
     a = p.parse_args(argv)
 
     if a.cmd == "build":
-        r = build(a.results, a.requirements, a.out, a.operator, a.config, a.format, a.run_id)
+        r = build(a.results, a.requirements, a.out, a.operator, a.config, a.format, a.run_id,
+                  dispositions_path=a.dispositions)
         m = r["meta"]
         print(f"Built evidence package in {a.out}/ ({m['n_tests']} tests, "
-              f"{len(r['deviations'])} deviations). Chain head: {m['chain_head']}")
+              f"{len(r['deviations'])} deviations, {len(r['dispositions'])} dispositions). "
+              f"Chain head: {m['chain_head']}")
         return 0
     if a.cmd == "head":
         head = read_head(a.log)

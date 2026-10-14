@@ -61,7 +61,35 @@ def matrix_markdown(matrix: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def summary_markdown(meta: dict, matrix: list[dict], devs: list[str]) -> str:
+def dispositions_markdown(dispositions: list[dict]) -> str:
+    """Render disposition records as a markdown table (or a none line)."""
+    if not dispositions:
+        return "None recorded."
+    lines = [
+        "| ID | Requirement | Test | Disposition | Approver | Approved at |",
+        "|---|---|---|---|---|---|",
+    ]
+    for d in dispositions:
+        lines.append(
+            f"| {d['deviation_id']} | {d.get('requirement_id') or '-'} | "
+            f"{d.get('test_id') or '-'} | {d['disposition']} | {d['approver']} | "
+            f"{d['approved_at']} |"
+        )
+    detail = []
+    for d in dispositions:
+        detail += [
+            f"### {d['deviation_id']}",
+            "",
+            f"- Description: {d['description'].strip()}",
+            f"- Root cause: {d['root_cause'].strip()}",
+            f"- Rationale: {d['disposition_rationale'].strip()}",
+            "",
+        ]
+    return "\n".join(lines) + "\n\n" + "\n".join(detail)
+
+
+def summary_markdown(meta: dict, matrix: list[dict], devs: list[str],
+                     dispositions: list[dict] | None = None) -> str:
     verdict = "PASS" if all(m["status"] == "PASS" for m in matrix) else "FAIL"
     banner = f"> **{meta['label']}**\n\n" if meta.get("label") else ""
     md = [f"# Validation Summary: {meta['run_id']}", "", banner.rstrip(), "",
@@ -78,6 +106,8 @@ def summary_markdown(meta: dict, matrix: list[dict], devs: list[str]) -> str:
           "## Pass/fail by requirement", "", matrix_markdown(matrix), "",
           "## Deviations", ""]
     md += [f"- {d}" for d in devs] or ["- None"]
+    md += ["", "## Deviation dispositions", "",
+           dispositions_markdown(dispositions or []), ""]
     md += ["", "## Review", "", "Reviewed by: ____________  Date: ________  (manual sign-off; "
            "this tool does not implement Part 11 electronic signatures)", "", "---", "",
            f"_{DISCLAIMER}_", ""]
@@ -109,7 +139,8 @@ def _status(s: str) -> str:
     return f"<span class='{html.escape(s)}'>{html.escape(s)}</span>"
 
 
-def summary_html_report(meta: dict, matrix: list[dict], devs: list[str]) -> str:
+def summary_html_report(meta: dict, matrix: list[dict], devs: list[str],
+                        dispositions: list[dict] | None = None) -> str:
     """Self-contained, print-friendly HTML validation summary (no external assets)."""
     e = html.escape
     verdict = "PASS" if all(m["status"] == "PASS" for m in matrix) else "FAIL"
@@ -144,8 +175,25 @@ def summary_html_report(meta: dict, matrix: list[dict], devs: list[str]) -> str:
             f"<td>{m['passed']}/{m['total']}</td><td>{_status(m['status'])}</td></tr>")
     parts.append("</table><h2>Deviations</h2><ul>")
     parts += [f"<li>{e(d)}</li>" for d in devs] or ["<li>None</li>"]
+    parts.append("</ul><h2>Deviation dispositions</h2>")
+    if dispositions:
+        parts.append("<table><tr><th>ID</th><th>Requirement</th><th>Test</th>"
+                     "<th>Disposition</th><th>Root cause</th><th>Approver</th>"
+                     "<th>Approved at</th></tr>")
+        for d in dispositions:
+            parts.append(
+                f"<tr><td>{e(d['deviation_id'])}</td>"
+                f"<td>{e(d.get('requirement_id') or '-')}</td>"
+                f"<td>{e(d.get('test_id') or '-')}</td>"
+                f"<td>{e(d['disposition'])}</td>"
+                f"<td>{e(d['root_cause'].strip())}</td>"
+                f"<td>{e(d['approver'])}</td>"
+                f"<td>{e(d['approved_at'])}</td></tr>")
+        parts.append("</table>")
+    else:
+        parts.append("<p>None recorded.</p>")
     parts.append(
-        "</ul><div class='sign'><p>Reviewed by: ____________________ "
+        "<div class='sign'><p>Reviewed by: ____________________ "
         "Date: ____________</p><p><em>Manual sign-off; this tool does not implement Part 11 "
         f"electronic signatures.</em></p></div><hr><p><small>{e(DISCLAIMER)}</small></p>"
         "</body></html>")
