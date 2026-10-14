@@ -6,6 +6,11 @@ import pytest
 from part11_eval_evidence import chain
 from part11_eval_evidence.build import build
 from part11_eval_evidence.cli import main
+from part11_eval_evidence.dispositions import (
+    DispositionError,
+    load_dispositions,
+    normalize_disposition,
+)
 from part11_eval_evidence.ingest import SchemaError, from_promptfoo, load_results, normalize
 
 EX = Path(__file__).parent.parent / "examples" / "synthetic_run"
@@ -115,3 +120,61 @@ def test_html_report_is_structured_and_escaped():
     out = summary_html_report(meta, matrix, ["Test T1 (R1): verdict FAIL"])
     assert "<table>" in out and "class='FAIL'" in out and "SYNTHETIC" in out
     assert "<script>x" not in out and "&lt;script&gt;" in out and "r&lt;1&gt;" in out
+
+
+def test_load_synthetic_dispositions():
+    rows = load_dispositions(EX / "dispositions.yaml")
+    assert len(rows) == 2
+    assert rows[0]["deviation_id"] == "DEV-001"
+    assert rows[0]["disposition"] == "corrected"
+    assert rows[0]["test_id"] == "T-002"
+    assert rows[1]["disposition"] == "deferred"
+    assert "SYNTHETIC" in rows[0]["description"]
+
+
+def test_disposition_schema_rejects_bad_values():
+    with pytest.raises(DispositionError):
+        normalize_disposition({"deviation_id": "D"})
+    bad = dict(
+        deviation_id="D1", requirement_id="R1", description="x", root_cause="y",
+        disposition="ignored", disposition_rationale="z",
+        approver="a", approved_at="2026-01-01T00:00:00Z",
+    )
+    with pytest.raises(DispositionError):
+        normalize_disposition(bad)
+
+
+def test_build_includes_dispositions_in_reports(tmp_path):
+    r = build(
+        EX / "results.jsonl", EX / "requirements.yaml", tmp_path, operator="tester",
+        config_path=EX / "config.yaml", run_id="test-run", now="2026-01-01T00:00:00Z",
+        dispositions_path=EX / "dispositions.yaml",
+    )
+    assert len(r["dispositions"]) == 2
+    assert all(d["covers_known_issue"] for d in r["dispositions"])
+    assert (tmp_path / "dispositions.csv").exists()
+    assert (tmp_path / "dispositions.json").exists()
+    md = (tmp_path / "validation_summary.md").read_text()
+    html = (tmp_path / "validation_summary.html").read_text()
+    assert "## Deviation dispositions" in md
+    assert "DEV-001" in md and "corrected" in md
+    assert "DEV-001" in html and "deferred" in html
+    assert "Deviation dispositions" in html
+
+
+def test_cli_build_with_dispositions(tmp_path, capsys):
+    out = tmp_path / "out"
+    rc = main([
+        "build",
+        "--results", str(EX / "results.jsonl"),
+        "--requirements", str(EX / "requirements.yaml"),
+        "--config", str(EX / "config.yaml"),
+        "--dispositions", str(EX / "dispositions.yaml"),
+        "--operator", "tester",
+        "--run-id", "cli-disp",
+        "--out", str(out),
+    ])
+    assert rc == 0
+    printed = capsys.readouterr().out
+    assert "2 dispositions" in printed
+    assert "DEV-002" in (out / "validation_summary.md").read_text()

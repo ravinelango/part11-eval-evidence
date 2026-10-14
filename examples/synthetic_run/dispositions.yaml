@@ -1,0 +1,29 @@
+# SYNTHETIC EXAMPLE — fabricated deviation dispositions for the demo run.
+# Not a real CAPA / QMS record. Label kept in every disposition description.
+label: "SYNTHETIC EXAMPLE - fabricated demo dispositions, not a real CAPA record"
+dispositions:
+  - deviation_id: DEV-001
+    test_id: T-002
+    requirement_id: REQ-001
+    description: >
+      SYNTHETIC EXAMPLE: T-002 failed citation completeness for REQ-001
+      (answer omitted the clause letter).
+    root_cause: >
+      SYNTHETIC: Demo prompt omitted the section letter; judge scored incomplete.
+    disposition: corrected
+    disposition_rationale: >
+      SYNTHETIC: Re-prompt with explicit citation format; retest scheduled.
+    approver: synthetic.reviewer@example.com
+    approved_at: "2026-01-02T15:00:00Z"
+  - deviation_id: DEV-002
+    requirement_id: REQ-004
+    description: >
+      SYNTHETIC EXAMPLE: REQ-004 (uncertainty when not in corpus) was not tested
+      in this run.
+    root_cause: >
+      SYNTHETIC: Uncertainty cases deferred from the initial fixture set.
+    disposition: deferred
+    disposition_rationale: >
+      SYNTHETIC: Accepted for this demo package; add T-006/T-007 in next cycle.
+    approver: synthetic.reviewer@example.com
+    approved_at: "2026-01-02T15:05:00Z"
