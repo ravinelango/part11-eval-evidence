@@ -3,7 +3,8 @@
 Native schema (one JSON object per line, or a JSON array):
   test_id, requirement_id, input, output, verdict ("pass"|"fail"|"error"),
   score (optional float), model, timestamp (ISO 8601).
-Adapters: promptfoo `--output results.json`, DeepEval-style test case lists (best effort).
+Adapters: promptfoo `--output results.json` / `.jsonl`,
+DeepEval-style test case lists (best effort).
 """
 
 from __future__ import annotations
@@ -41,21 +42,64 @@ def normalize(rec: dict) -> dict:
     return out
 
 
-def from_promptfoo(data: dict) -> list[dict]:
-    """promptfoo eval JSON: results.results[] with vars, response.output, success, score."""
-    rows = data.get("results", {}).get("results", [])
+# promptfoo ResultFailureReason: 0 = none, 1 = assertion failed, 2 = provider/runtime error
+_PF_ERROR = 2
+
+
+def _pf_rows(data) -> tuple[list[dict], str | None]:
+    """Return (result rows, run timestamp) for any promptfoo export shape we accept.
+
+    - `-o results.json`: {evalId, results: {version, timestamp, results: [...], stats}, config}
+    - older JSON: {createdAt, results: {results: [...]}}
+    - `-o results.jsonl`: one result row per line (no run timestamp)
+    """
+    if isinstance(data, list):
+        return data, None
+    inner = data.get("results") or {}
+    if isinstance(inner, list):
+        return inner, data.get("timestamp") or data.get("createdAt")
+    ts = inner.get("timestamp") or data.get("timestamp") or data.get("createdAt")
+    return inner.get("results") or [], ts
+
+
+def _pf_verdict(r: dict) -> str:
+    if r.get("error") or r.get("failureReason") == _PF_ERROR:
+        return "error"
+    if r.get("success"):
+        return "pass"
+    return "fail"
+
+
+def _pf_provider(r: dict) -> str:
+    prov = r.get("provider")
+    if isinstance(prov, str):
+        return prov
+    prov = prov or {}
+    return prov.get("label") or prov.get("id") or "unknown"
+
+
+def from_promptfoo(data) -> list[dict]:
+    """Map promptfoo result rows to the native schema.
+
+    `requirement_id` / `test_id` come from the test's `metadata`. Rows without a test_id
+    get a stable id from their position (`pf-t<testIdx>-p<promptIdx>`), so the same eval
+    re-exported maps to the same ids.
+    """
+    rows, run_ts = _pf_rows(data)
     recs = []
     for i, r in enumerate(rows):
-        meta = (r.get("testCase") or {}).get("metadata") or {}
+        tc = r.get("testCase") or {}
+        meta = {**(r.get("metadata") or {}), **(tc.get("metadata") or {})}
+        t_idx, p_idx = r.get("testIdx", i), r.get("promptIdx", 0)
         recs.append({
-            "test_id": meta.get("test_id", f"pf-{i}"),
+            "test_id": meta.get("test_id", f"pf-t{t_idx}-p{p_idx}"),
             "requirement_id": meta.get("requirement_id", "UNMAPPED"),
-            "input": json.dumps(r.get("vars", {})),
-            "output": (r.get("response") or {}).get("output", ""),
-            "verdict": "pass" if r.get("success") else ("error" if r.get("error") else "fail"),
+            "input": json.dumps(r.get("vars", tc.get("vars", {})), sort_keys=True),
+            "output": (r.get("response") or {}).get("output", "") or "",
+            "verdict": _pf_verdict(r),
             "score": r.get("score"),
-            "model": (r.get("provider") or {}).get("id", "unknown"),
-            "timestamp": data.get("createdAt") or meta.get("timestamp", "unknown"),
+            "model": _pf_provider(r),
+            "timestamp": run_ts or meta.get("timestamp", "unknown"),
         })
     return recs
 
