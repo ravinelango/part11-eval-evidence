@@ -33,9 +33,13 @@ p11e head out/run_log.jsonl            # print the chain head to record outside 
 p11e verify out/run_log.jsonl --expect-head <recorded-sha256>
 ```
 
-Other inputs: `--format promptfoo` (promptfoo `-o results.json`; put `requirement_id`/`test_id`
-in test `metadata`) or `--format deepeval` (best-effort for DeepEval-style test case lists).
-These adapters are lightweight and tested only on minimal samples.
+Other inputs: `--format promptfoo` reads promptfoo `-o results.json` (version 3) or
+`-o results.jsonl`; put `requirement_id`/`test_id` in each test's `metadata`. Provider errors
+become `verdict=error`, and rows with no `test_id` get a stable `pf-t<testIdx>-p<promptIdx>` id.
+JSONL rows carry no run timestamp, so prefer the JSON export for the audit trail. Fixtures in
+[`examples/promptfoo_synthetic/`](examples/promptfoo_synthetic/) are hand-written synthetic
+rows in promptfoo's export shape, not output from a real run. `--format deepeval` is best-effort
+for DeepEval-style test case lists and tested only on minimal samples.
 
 ## Input schema (native)
 

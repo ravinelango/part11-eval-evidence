@@ -178,3 +178,34 @@ def test_cli_build_with_dispositions(tmp_path, capsys):
     printed = capsys.readouterr().out
     assert "2 dispositions" in printed
     assert "DEV-002" in (out / "validation_summary.md").read_text()
+
+
+PF_DIR = Path(__file__).parent.parent / "examples" / "promptfoo_synthetic"
+
+
+def test_promptfoo_v3_json_and_jsonl_fixtures_agree():
+    full = load_results(PF_DIR / "results.json", fmt="promptfoo")
+    lines = load_results(PF_DIR / "results.jsonl", fmt="promptfoo")
+    assert [r["verdict"] for r in full] == ["pass", "pass", "fail", "error"]
+    assert [r["test_id"] for r in full] == [r["test_id"] for r in lines]
+    assert [r["verdict"] for r in full] == [r["verdict"] for r in lines]
+    assert full[0]["timestamp"] == "2026-01-01T10:00:00Z"
+    assert lines[0]["timestamp"] == "unknown"  # JSONL rows carry no run timestamp
+    assert full[0]["model"] == "example-model-v1"
+    assert full[3]["output"] == ""
+
+
+def test_promptfoo_rows_without_metadata_get_stable_ids():
+    rows = [{"testIdx": 3, "promptIdx": 1, "success": False, "provider": "echo",
+             "response": {"output": "x"}}]
+    rec = normalize(from_promptfoo(rows)[0])
+    assert rec["test_id"] == "pf-t3-p1" and rec["requirement_id"] == "UNMAPPED"
+    assert rec["model"] == "echo" and rec["verdict"] == "fail"
+
+
+def test_build_from_promptfoo_fixture(tmp_path):
+    r = build(PF_DIR / "results.json", EX / "requirements.yaml", tmp_path, fmt="promptfoo",
+              run_id="pf-test", now="2026-01-01T00:00:00Z")
+    assert r["meta"]["n_tests"] == 4
+    assert "Test PF-003 (REQ-003): verdict FAIL" in r["deviations"]
+    assert "Test PF-004 (REQ-004): verdict ERROR" in r["deviations"]
