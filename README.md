@@ -100,7 +100,7 @@ Clause text checked against [eCFR 21 CFR Part 11](https://www.ecfr.gov/current/t
 - **Tamper-evident, not tamper-proof.** Someone who can rewrite the whole log can rebuild the chain. Record the chain head somewhere independent (QMS record, ticket, signed tag) and check it with `--expect-head`; see [docs/anchoring.md](docs/anchoring.md).
 - No access control, user authentication, or Part 11 electronic signatures. Sign-off is a manual line.
 - The operator name is self-reported. Timestamps come from the eval harness and the local clock.
-- The tool itself would need validation before you rely on it in a GxP context.
+- The tool itself would need validation before you rely on it in a GxP context; see the IQ/OQ template in [docs/validation-plan.md](docs/validation-plan.md).
 - The HTML report is a minimal printable wrapper.
 
 ## Development
