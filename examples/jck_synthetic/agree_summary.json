@@ -1,0 +1,23 @@
+{
+  "mode": "human_human",
+  "rater_a": "human_a",
+  "rater_b": "human_b",
+  "n": 8,
+  "raw_agreement": 0.75,
+  "kappa": 0.4666666666666667,
+  "kappa_ci_95": [
+    -0.25,
+    1.0
+  ],
+  "confusion": {
+    "pass": {
+      "pass": 4,
+      "fail": 1
+    },
+    "fail": {
+      "pass": 1,
+      "fail": 2
+    }
+  },
+  "synthetic": true
+}

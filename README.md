@@ -41,6 +41,15 @@ JSONL rows carry no run timestamp, so prefer the JSON export for the audit trail
 rows in promptfoo's export shape, not output from a real run. `--format deepeval` is best-effort
 for DeepEval-style test case lists and tested only on minimal samples.
 
+`--format jck` reads a [judge-calibration-kit](https://github.com/ravinelango/judge-calibration-kit)
+`--json` summary (`jck run`, `jck agree` or `jck ab`) as evidence that an LLM judge was
+checked against human labels before its verdicts were trusted. Each calibrated configuration
+becomes one record mapped to `--requirement-id`, with `verdict=pass` when Cohen's kappa is at
+least `--min-kappa` (default 0.6), `fail` below it, and `error` when kappa is missing or n < 2.
+Agreement, the kappa CI and the confusion matrix are kept in the record's output. The threshold
+is yours to justify; 0.6 is a common starting point, not a regulatory number. Synthetic
+summaries from jck's mock judges are in [`examples/jck_synthetic/`](examples/jck_synthetic/).
+
 ## Input schema (native)
 
 JSONL, one object per line (or a JSON array):

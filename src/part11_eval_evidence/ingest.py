@@ -4,12 +4,14 @@ Native schema (one JSON object per line, or a JSON array):
   test_id, requirement_id, input, output, verdict ("pass"|"fail"|"error"),
   score (optional float), model, timestamp (ISO 8601).
 Adapters: promptfoo `--output results.json` / `.jsonl`,
+judge-calibration-kit (`jck run|agree|ab --json`) summaries,
 DeepEval-style test case lists (best effort).
 """
 
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 REQUIRED = ("test_id", "requirement_id", "input", "output", "verdict", "model", "timestamp")
@@ -123,10 +125,67 @@ def from_deepeval(rows: list[dict]) -> list[dict]:
     return recs
 
 
-def load_results(path: str | Path, fmt: str = "native") -> list[dict]:
+DEFAULT_MIN_KAPPA = 0.6
+
+
+def _jck_record(test_id: str, model: str, side: dict, top: dict, requirement_id: str,
+                min_kappa: float) -> dict:
+    kappa = side.get("kappa")
+    ok = isinstance(kappa, (int, float)) and not math.isnan(kappa) and top.get("n", 0) >= 2
+    verdict = ("pass" if kappa >= min_kappa else "fail") if ok else "error"
+    metrics = {k: side.get(k) for k in ("raw_agreement", "kappa", "kappa_ci_95",
+                                         "judge_pass_rate", "confusion") if k in side}
+    return {
+        "test_id": test_id,
+        "requirement_id": requirement_id,
+        "input": json.dumps({"mode": top.get("mode"), "n": top.get("n"),
+                             "min_kappa": min_kappa, "synthetic": bool(top.get("synthetic"))},
+                            sort_keys=True),
+        "output": json.dumps(metrics, sort_keys=True),
+        "verdict": verdict,
+        "score": kappa if ok else None,
+        "model": model,
+        "timestamp": top.get("generated_at", "unknown"),
+    }
+
+
+def from_jck(data: dict, requirement_id: str = "UNMAPPED",
+             min_kappa: float = DEFAULT_MIN_KAPPA) -> list[dict]:
+    """Map a judge-calibration-kit `--json` summary to calibration evidence records.
+
+    jck reports agreement between an LLM judge (or a second rater) and human labels. Each
+    calibrated configuration becomes one record whose verdict is `pass` when Cohen's kappa
+    meets `min_kappa`, `fail` below it, and `error` when kappa is missing or n < 2. The full
+    metrics (agreement, kappa CI, confusion) go in `output` for the reviewer.
+
+    - `mode: judge`       -> one record, test_id `jck-judge`, model = judge name
+    - `mode: human_human` -> one record, test_id `jck-human-human`, model = "raterA vs raterB"
+    - `mode: ab`          -> two records, `jck-ab-a` and `jck-ab-b`, one per judge config
+    """
+    if isinstance(data, list):
+        if len(data) != 1:
+            raise SchemaError("jck summary must be a single JSON object")
+        data = data[0]
+    mode = data.get("mode")
+    args = (requirement_id, min_kappa)
+    if mode == "judge":
+        return [_jck_record("jck-judge", data.get("judge", "unknown"), data, data, *args)]
+    if mode == "human_human":
+        model = f"{data.get('rater_a', 'a')} vs {data.get('rater_b', 'b')}"
+        return [_jck_record("jck-human-human", model, data, data, *args)]
+    if mode == "ab":
+        return [_jck_record(f"jck-ab-{side}", data.get(f"judge_{side}", side),
+                            data.get(side) or {}, data, *args) for side in ("a", "b")]
+    raise SchemaError(f"unknown jck summary mode {mode!r}; expected judge, human_human or ab")
+
+
+def load_results(path: str | Path, fmt: str = "native", requirement_id: str = "UNMAPPED",
+                 min_kappa: float = DEFAULT_MIN_KAPPA) -> list[dict]:
     data = _read(Path(path))
     if fmt == "promptfoo":
         data = from_promptfoo(data)
+    elif fmt == "jck":
+        data = from_jck(data, requirement_id, min_kappa)
     elif fmt == "deepeval":
         data = from_deepeval(data)
     elif isinstance(data, dict):

@@ -1,0 +1,22 @@
+{
+  "mode": "judge",
+  "judge": "mock",
+  "n": 10,
+  "raw_agreement": 0.8,
+  "kappa": 0.5833333333333334,
+  "kappa_ci_95": [
+    0.0,
+    1.0
+  ],
+  "confusion": {
+    "pass": {
+      "pass": 5,
+      "fail": 1
+    },
+    "fail": {
+      "pass": 1,
+      "fail": 3
+    }
+  },
+  "synthetic": true
+}

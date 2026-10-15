@@ -1,0 +1,5 @@
+label: "SYNTHETIC EXAMPLE - fabricated demo data, not a real eval run or real system"
+requirements:
+  - id: REQ-JUDGE-001
+    description: LLM judge agrees with human labels (Cohen's kappa >= 0.6) before its verdicts are used as evidence
+    risk: high

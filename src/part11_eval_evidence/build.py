@@ -20,13 +20,14 @@ def file_hash(path: Path | None) -> str:
 
 
 def build(results_path, requirements_path, out_dir, operator=None, config_path=None,
-          fmt="native", run_id=None, now=None, dispositions_path=None) -> dict:
+          fmt="native", run_id=None, now=None, dispositions_path=None,
+          ingest_opts=None) -> dict:
     results_path, requirements_path = Path(results_path), Path(requirements_path)
     config_path = Path(config_path) if config_path else None
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    results = load_results(results_path, fmt)
+    results = load_results(results_path, fmt, **(ingest_opts or {}))
     req_doc = yaml.safe_load(requirements_path.read_text(encoding="utf-8")) or {}
     requirements = req_doc.get("requirements", [])
     generated = now or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")

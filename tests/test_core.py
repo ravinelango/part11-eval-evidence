@@ -11,7 +11,13 @@ from part11_eval_evidence.dispositions import (
     load_dispositions,
     normalize_disposition,
 )
-from part11_eval_evidence.ingest import SchemaError, from_promptfoo, load_results, normalize
+from part11_eval_evidence.ingest import (
+    SchemaError,
+    from_jck,
+    from_promptfoo,
+    load_results,
+    normalize,
+)
 
 EX = Path(__file__).parent.parent / "examples" / "synthetic_run"
 
@@ -209,3 +215,53 @@ def test_build_from_promptfoo_fixture(tmp_path):
     assert r["meta"]["n_tests"] == 4
     assert "Test PF-003 (REQ-003): verdict FAIL" in r["deviations"]
     assert "Test PF-004 (REQ-004): verdict ERROR" in r["deviations"]
+
+
+JCK_DIR = Path(__file__).parent.parent / "examples" / "jck_synthetic"
+
+
+def test_jck_judge_summary_maps_to_one_record():
+    (rec,) = load_results(JCK_DIR / "judge_summary.json", fmt="jck",
+                          requirement_id="REQ-JUDGE-001")
+    assert rec["test_id"] == "jck-judge" and rec["model"] == "mock"
+    assert rec["requirement_id"] == "REQ-JUDGE-001"
+    assert rec["verdict"] == "fail" and rec["score"] == pytest.approx(0.5833, abs=1e-4)
+    assert json.loads(rec["input"]) == {"min_kappa": 0.6, "mode": "judge", "n": 10,
+                                        "synthetic": True}
+    out = json.loads(rec["output"])
+    assert out["raw_agreement"] == 0.8 and out["confusion"]["fail"]["fail"] == 3
+    assert load_results(JCK_DIR / "judge_summary.json", fmt="jck",
+                        min_kappa=0.5)[0]["verdict"] == "pass"
+
+
+def test_jck_ab_and_human_human_summaries():
+    a, b = load_results(JCK_DIR / "ab_summary.json", fmt="jck")
+    assert (a["test_id"], a["model"], a["verdict"]) == ("jck-ab-a", "mock", "fail")
+    assert (b["test_id"], b["model"], b["verdict"]) == ("jck-ab-b", "mock:strict", "pass")
+    assert a["requirement_id"] == "UNMAPPED" and b["timestamp"] == "unknown"
+    (h,) = load_results(JCK_DIR / "agree_summary.json", fmt="jck", min_kappa=0.4)
+    assert h["test_id"] == "jck-human-human" and h["model"] == "human_a vs human_b"
+    assert h["verdict"] == "pass"
+
+
+def test_jck_degenerate_and_unknown_summaries():
+    rec = normalize(from_jck({"mode": "judge", "judge": "x", "n": 1, "kappa": 1.0})[0])
+    assert rec["verdict"] == "error" and rec["score"] is None
+    rec = normalize(from_jck({"mode": "judge", "judge": "x", "n": 5, "kappa": float("nan")})[0])
+    assert rec["verdict"] == "error"
+    with pytest.raises(SchemaError):
+        from_jck({"mode": "pairwise"})
+    with pytest.raises(SchemaError):
+        from_jck([{"mode": "judge"}, {"mode": "judge"}])
+
+
+def test_cli_build_from_jck_ab_fixture(tmp_path, capsys):
+    out = tmp_path / "out"
+    assert main(["build", "--format", "jck", "--results", str(JCK_DIR / "ab_summary.json"),
+                 "--requirements", str(JCK_DIR / "requirements.yaml"),
+                 "--requirement-id", "REQ-JUDGE-001", "--operator", "tester",
+                 "--out", str(out)]) == 0
+    assert "2 tests, 1 deviations" in capsys.readouterr().out
+    matrix = (out / "traceability_matrix.csv").read_text()
+    assert "REQ-JUDGE-001" in matrix and "jck-ab-a;jck-ab-b" in matrix and "FAIL" in matrix
+    assert main(["verify", str(out / "run_log.jsonl")]) == 0

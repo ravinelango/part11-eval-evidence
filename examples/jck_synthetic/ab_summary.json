@@ -1,0 +1,47 @@
+{
+  "mode": "ab",
+  "judge_a": "mock",
+  "judge_b": "mock:strict",
+  "n": 10,
+  "a": {
+    "raw_agreement": 0.8,
+    "kappa": 0.5833333333333334,
+    "kappa_ci_95": [
+      0.0,
+      1.0
+    ],
+    "judge_pass_rate": 0.6,
+    "confusion": {
+      "pass": {
+        "pass": 5,
+        "fail": 1
+      },
+      "fail": {
+        "pass": 1,
+        "fail": 3
+      }
+    }
+  },
+  "b": {
+    "raw_agreement": 0.9,
+    "kappa": 0.8,
+    "kappa_ci_95": [
+      0.3999999999999999,
+      1.0
+    ],
+    "judge_pass_rate": 0.5,
+    "confusion": {
+      "pass": {
+        "pass": 5,
+        "fail": 1
+      },
+      "fail": {
+        "pass": 0,
+        "fail": 4
+      }
+    }
+  },
+  "higher_kappa": "b",
+  "a_b_disagreements": 1,
+  "synthetic": true
+}
