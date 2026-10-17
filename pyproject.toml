@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "part11-eval-evidence"
-version = "0.1.0"
+version = "0.2.0"
 description = "Turn an LLM eval run into an audit-ready evidence package (hash-chained log, traceability matrix, validation summary) informed by FDA 21 CFR Part 11."
 readme = "README.md"
 license = {text = "MIT"}
