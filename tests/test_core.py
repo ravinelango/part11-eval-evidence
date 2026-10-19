@@ -13,6 +13,7 @@ from part11_eval_evidence.dispositions import (
 )
 from part11_eval_evidence.ingest import (
     SchemaError,
+    from_deepeval,
     from_jck,
     from_promptfoo,
     load_results,
@@ -265,3 +266,22 @@ def test_cli_build_from_jck_ab_fixture(tmp_path, capsys):
     matrix = (out / "traceability_matrix.csv").read_text()
     assert "REQ-JUDGE-001" in matrix and "jck-ab-a;jck-ab-b" in matrix and "FAIL" in matrix
     assert main(["verify", str(out / "run_log.jsonl")]) == 0
+
+
+def test_deepeval_camelcase_test_run_and_metric_errors():
+    run = {"testCases": [
+        {"name": "case-1", "input": "q1", "actualOutput": "a1", "success": True,
+         "metricsData": [{"name": "Faithfulness", "score": 0.9, "success": True},
+                         {"name": "Relevancy", "score": 0.7, "success": True}],
+         "additionalMetadata": {"requirement_id": "REQ-001", "model": "m1"}},
+        {"name": "case-2", "input": "q2", "actualOutput": "a2", "success": False,
+         "metricsData": [{"name": "Faithfulness", "score": None, "success": False,
+                          "error": "judge timed out"}]}]}
+    recs = [normalize(r) for r in from_deepeval(run)]
+    assert [r["verdict"] for r in recs] == ["pass", "error"]
+    assert recs[0]["score"] == 0.7 and recs[0]["model"] == "m1"
+    assert recs[0]["output"] == "a1" and recs[0]["requirement_id"] == "REQ-001"
+    assert recs[1]["score"] is None and recs[1]["requirement_id"] == "UNMAPPED"
+    snake = [{"name": "case-1", "input": "q1", "actual_output": "a1", "success": False,
+              "metrics_data": [{"score": 0.2}]}]
+    assert from_deepeval(snake)[0]["verdict"] == "fail"

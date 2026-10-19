@@ -5,7 +5,7 @@ Native schema (one JSON object per line, or a JSON array):
   score (optional float), model, timestamp (ISO 8601).
 Adapters: promptfoo `--output results.json` / `.jsonl`,
 judge-calibration-kit (`jck run|agree|ab --json`) summaries,
-DeepEval-style test case lists (best effort).
+DeepEval test-run files or test case lists (snake_case or camelCase).
 """
 
 from __future__ import annotations
@@ -106,19 +106,45 @@ def from_promptfoo(data) -> list[dict]:
     return recs
 
 
-def from_deepeval(rows: list[dict]) -> list[dict]:
-    """DeepEval-style list: {name, input, actual_output, success, metrics_data:[{score}], ...}."""
+def _de(r: dict, snake: str, camel: str, default=None):
+    """DeepEval writes pydantic aliases (camelCase) in test-run files; accept both spellings."""
+    if snake in r:
+        return r[snake]
+    return r.get(camel, default)
+
+
+def _de_rows(data) -> list[dict]:
+    """Test cases from a DeepEval test-run file (`{"testCases": [...]}`) or a bare list."""
+    if isinstance(data, dict):
+        return _de(data, "test_cases", "testCases", []) or []
+    return data
+
+
+def from_deepeval(data) -> list[dict]:
+    """Map DeepEval test cases to the native schema.
+
+    Accepts a bare list of test cases or a test-run object with `testCases`, in snake_case or
+    camelCase (`actualOutput`, `metricsData`, `additionalMetadata`). A metric that raised an
+    error makes the case `verdict=error`; otherwise the case's `success` decides pass/fail.
+    `score` is the lowest metric score, since the weakest metric is what failed the case.
+    `model` comes from `additional_metadata.model`, not the metric's evaluation (judge) model.
+    """
     recs = []
-    for i, r in enumerate(rows):
-        md = r.get("metrics_data") or []
-        meta = r.get("additional_metadata") or {}
+    for i, r in enumerate(_de_rows(data)):
+        md = _de(r, "metrics_data", "metricsData", []) or []
+        meta = _de(r, "additional_metadata", "additionalMetadata", {}) or {}
+        scores = [m["score"] for m in md if isinstance(m.get("score"), (int, float))]
+        if any(m.get("error") for m in md):
+            verdict = "error"
+        else:
+            verdict = "pass" if r.get("success") else "fail"
         recs.append({
-            "test_id": r.get("name", f"de-{i}"),
+            "test_id": meta.get("test_id") or r.get("name") or f"de-{i}",
             "requirement_id": meta.get("requirement_id", "UNMAPPED"),
             "input": r.get("input", ""),
-            "output": r.get("actual_output", ""),
-            "verdict": "pass" if r.get("success") else "fail",
-            "score": md[0].get("score") if md else None,
+            "output": _de(r, "actual_output", "actualOutput", "") or "",
+            "verdict": verdict,
+            "score": min(scores) if scores else None,
             "model": meta.get("model", "unknown"),
             "timestamp": meta.get("timestamp", "unknown"),
         })
