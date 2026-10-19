@@ -38,8 +38,12 @@ Other inputs: `--format promptfoo` reads promptfoo `-o results.json` (version 3)
 become `verdict=error`, and rows with no `test_id` get a stable `pf-t<testIdx>-p<promptIdx>` id.
 JSONL rows carry no run timestamp, so prefer the JSON export for the audit trail. Fixtures in
 [`examples/promptfoo_synthetic/`](examples/promptfoo_synthetic/) are hand-written synthetic
-rows in promptfoo's export shape, not output from a real run. `--format deepeval` is best-effort
-for DeepEval-style test case lists and tested only on minimal samples.
+rows in promptfoo's export shape, not output from a real run. `--format deepeval` reads a
+DeepEval test-run object (`testCases`, camelCase) or a bare list of test cases (snake_case); put
+`requirement_id`/`test_id`/`model` in `additional_metadata`. A metric error becomes
+`verdict=error` and `score` is the lowest metric score. The fixture in
+[`examples/deepeval_synthetic/`](examples/deepeval_synthetic/) is hand-written synthetic data in
+that shape, not output from a real run.
 
 `--format jck` reads a [judge-calibration-kit](https://github.com/ravinelango/judge-calibration-kit)
 `--json` summary (`jck run`, `jck agree` or `jck ab`) as evidence that an LLM judge was

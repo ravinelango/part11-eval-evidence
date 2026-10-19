@@ -285,3 +285,17 @@ def test_deepeval_camelcase_test_run_and_metric_errors():
     snake = [{"name": "case-1", "input": "q1", "actual_output": "a1", "success": False,
               "metrics_data": [{"score": 0.2}]}]
     assert from_deepeval(snake)[0]["verdict"] == "fail"
+
+
+DE_DIR = Path(__file__).parent.parent / "examples" / "deepeval_synthetic"
+
+
+def test_build_from_deepeval_fixture(tmp_path):
+    recs = load_results(DE_DIR / "test_run.json", fmt="deepeval")
+    assert [r["test_id"] for r in recs] == ["DE-001", "DE-002", "DE-003", "DE-004"]
+    assert recs[2]["score"] == 0.0 and recs[3]["score"] is None
+    r = build(DE_DIR / "test_run.json", EX / "requirements.yaml", tmp_path, fmt="deepeval",
+              run_id="de-test", now="2026-01-01T00:00:00Z")
+    assert r["meta"]["n_tests"] == 4
+    assert "Test DE-003 (REQ-003): verdict FAIL" in r["deviations"]
+    assert "Test DE-004 (REQ-004): verdict ERROR" in r["deviations"]
