@@ -216,4 +216,20 @@ def load_results(path: str | Path, fmt: str = "native", requirement_id: str = "U
         data = from_deepeval(data)
     elif isinstance(data, dict):
         data = [data]
-    return [normalize(r) for r in data]
+    recs = [normalize(r) for r in data]
+    _check_unique_ids(recs)
+    return recs
+
+
+def _check_unique_ids(recs: list[dict]) -> None:
+    """Each test_id must appear once, or the traceability matrix and deviation list
+    would silently merge two different results under one id."""
+    seen: set[str] = set()
+    dupes: list[str] = []
+    for r in recs:
+        tid = str(r["test_id"])
+        if tid in seen and tid not in dupes:
+            dupes.append(tid)
+        seen.add(tid)
+    if dupes:
+        raise SchemaError(f"duplicate test_id values: {dupes}; each result needs its own id")

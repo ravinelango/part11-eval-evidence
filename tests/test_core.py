@@ -299,3 +299,12 @@ def test_build_from_deepeval_fixture(tmp_path):
     assert r["meta"]["n_tests"] == 4
     assert "Test DE-003 (REQ-003): verdict FAIL" in r["deviations"]
     assert "Test DE-004 (REQ-004): verdict ERROR" in r["deviations"]
+
+
+def test_duplicate_test_ids_are_rejected(tmp_path):
+    rec = dict(test_id="T-1", requirement_id="R", input="", output="", verdict="pass",
+               model="m", timestamp="2026-01-01T00:00:00Z")
+    p = tmp_path / "dupes.jsonl"
+    p.write_text("\n".join(json.dumps(r) for r in (rec, {**rec, "verdict": "fail"})))
+    with pytest.raises(SchemaError, match="duplicate test_id"):
+        load_results(p)
