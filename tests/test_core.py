@@ -308,3 +308,14 @@ def test_duplicate_test_ids_are_rejected(tmp_path):
     p.write_text("\n".join(json.dumps(r) for r in (rec, {**rec, "verdict": "fail"})))
     with pytest.raises(SchemaError, match="duplicate test_id"):
         load_results(p)
+
+
+def test_promptfoo_same_test_id_across_providers_gets_column_suffix():
+    def row(p_idx, provider, ok):
+        return {"testIdx": 0, "promptIdx": p_idx, "success": ok, "provider": {"id": provider},
+                "response": {"output": "x"}, "vars": {"q": "synthetic"},
+                "testCase": {"metadata": {"requirement_id": "REQ-1", "test_id": "PF-1"}}}
+    recs = from_promptfoo({"results": {"results": [row(0, "mock:a", True),
+                                                   row(1, "mock:b", False)]}})
+    assert [(r["test_id"], r["model"], r["verdict"]) for r in recs] == [
+        ("PF-1/p0", "mock:a", "pass"), ("PF-1/p1", "mock:b", "fail")]

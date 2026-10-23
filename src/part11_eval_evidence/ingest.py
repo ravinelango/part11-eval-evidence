@@ -85,16 +85,28 @@ def from_promptfoo(data) -> list[dict]:
 
     `requirement_id` / `test_id` come from the test's `metadata`. Rows without a test_id
     get a stable id from their position (`pf-t<testIdx>-p<promptIdx>`), so the same eval
-    re-exported maps to the same ids.
+    re-exported maps to the same ids. One test run against several prompts or providers
+    yields one row per column with the same metadata test_id; those ids get a `/p<promptIdx>`
+    suffix so each column stays a separate result.
     """
     rows, run_ts = _pf_rows(data)
-    recs = []
-    for i, r in enumerate(rows):
+    metas = []
+    for r in rows:
         tc = r.get("testCase") or {}
-        meta = {**(r.get("metadata") or {}), **(tc.get("metadata") or {})}
+        metas.append({**(r.get("metadata") or {}), **(tc.get("metadata") or {})})
+    counts: dict[str, int] = {}
+    for meta in metas:
+        if "test_id" in meta:
+            counts[meta["test_id"]] = counts.get(meta["test_id"], 0) + 1
+    recs = []
+    for i, (r, meta) in enumerate(zip(rows, metas, strict=True)):
+        tc = r.get("testCase") or {}
         t_idx, p_idx = r.get("testIdx", i), r.get("promptIdx", 0)
+        tid = meta.get("test_id", f"pf-t{t_idx}-p{p_idx}")
+        if counts.get(tid, 0) > 1:
+            tid = f"{tid}/p{p_idx}"
         recs.append({
-            "test_id": meta.get("test_id", f"pf-t{t_idx}-p{p_idx}"),
+            "test_id": tid,
             "requirement_id": meta.get("requirement_id", "UNMAPPED"),
             "input": json.dumps(r.get("vars", tc.get("vars", {})), sort_keys=True),
             "output": (r.get("response") or {}).get("output", "") or "",

@@ -36,6 +36,8 @@ p11e verify out/run_log.jsonl --expect-head <recorded-sha256>
 Other inputs: `--format promptfoo` reads promptfoo `-o results.json` (version 3) or
 `-o results.jsonl`; put `requirement_id`/`test_id` in each test's `metadata`. Provider errors
 become `verdict=error`, and rows with no `test_id` get a stable `pf-t<testIdx>-p<promptIdx>` id.
+When one test runs against several prompts or providers, its repeated `test_id` gets a
+`/p<promptIdx>` suffix per column; any other duplicate `test_id` is rejected.
 JSONL rows carry no run timestamp, so prefer the JSON export for the audit trail. Fixtures in
 [`examples/promptfoo_synthetic/`](examples/promptfoo_synthetic/) are hand-written synthetic
 rows in promptfoo's export shape, not output from a real run. `--format deepeval` reads a
