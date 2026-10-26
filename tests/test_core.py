@@ -61,6 +61,16 @@ def test_chain_detects_deletion(tmp_path):
     assert not chain.verify_chain(p)[0]
 
 
+
+@pytest.mark.parametrize("bad", ["[1, 2]", "null", '"text"', "42"])
+def test_chain_reports_non_object_lines_instead_of_crashing(tmp_path, bad):
+    p = tmp_path / "log.jsonl"
+    chain.write_chain(chain.build_chain([{"a": 1}, {"b": 2}]), p)
+    p.write_text(p.read_text() + bad + "\n")
+    ok, probs = chain.verify_chain(p)
+    assert not ok and any("line 3: not a log entry" in x for x in probs)
+    assert chain.read_head(p) is None
+
 def test_build_matrix_and_deviations(tmp_path):
     r = _build(tmp_path)
     status = {m["requirement_id"]: m["status"] for m in r["matrix"]}

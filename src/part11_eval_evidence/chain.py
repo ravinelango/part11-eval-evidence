@@ -45,6 +45,9 @@ def verify_chain(path: str | Path) -> tuple[bool, list[str]]:
         except json.JSONDecodeError:
             problems.append(f"line {i + 1}: not valid JSON")
             break
+        if not isinstance(e, dict):
+            problems.append(f"line {i + 1}: not a log entry (expected a JSON object)")
+            break
         body = {"seq": e.get("seq"), "prev_hash": e.get("prev_hash"), "event": e.get("event")}
         if e.get("seq") != i:
             problems.append(f"line {i + 1}: sequence {e.get('seq')} != {i} (reordered/removed?)")
@@ -64,9 +67,10 @@ def read_head(path: str | Path) -> str | None:
     if not lines:
         return None
     try:
-        return json.loads(lines[-1]).get("hash")
+        last = json.loads(lines[-1])
     except json.JSONDecodeError:
         return None
+    return last.get("hash") if isinstance(last, dict) else None
 
 
 def verify_against_anchor(path: str | Path, expected_head: str) -> tuple[bool, list[str]]:
