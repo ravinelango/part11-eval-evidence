@@ -40,6 +40,8 @@ p11e verify out/run_log.jsonl --expect-head <recorded-sha256>
 
 Exit code `0` means the chain is intact **and** its head matches the recorded value.
 Exit code `1` lists every problem found, including a head mismatch.
+Exit code `2` means the check never ran: the log file is missing or the recorded value is
+not a 64-character SHA-256 hex digest (for example, a truncated copy-paste).
 
 ## What this does and doesn't give you
 
