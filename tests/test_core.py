@@ -116,6 +116,18 @@ def test_cli_head_and_expect_head(tmp_path, capsys):
     assert main(["verify", log, "--expect-head", "0" * 64]) == 1
 
 
+def test_cli_missing_log_and_bad_anchor(tmp_path, capsys):
+    missing = str(tmp_path / "nope.jsonl")
+    assert main(["verify", missing]) == 2
+    assert main(["head", missing]) == 2
+    assert "No such log file" in capsys.readouterr().err
+    _build(tmp_path)
+    log = str(tmp_path / "run_log.jsonl")
+    # A truncated or pasted-wrong anchor is a usage error, not a tamper finding.
+    assert main(["verify", log, "--expect-head", "abc123"]) == 2
+    assert "64-character" in capsys.readouterr().err
+
+
 def test_promptfoo_adapter():
     data = {"createdAt": "2026-01-01", "results": {"results": [
         {"vars": {"q": "hi"}, "response": {"output": "hello"}, "success": True, "score": 1,

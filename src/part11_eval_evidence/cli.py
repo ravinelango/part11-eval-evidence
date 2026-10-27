@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sys
+from pathlib import Path
 
 from .build import build
 from .chain import read_head, verify_against_anchor, verify_chain
@@ -44,6 +46,9 @@ def main(argv=None) -> int:
               f"{len(r['deviations'])} deviations, {len(r['dispositions'])} dispositions). "
               f"Chain head: {m['chain_head']}")
         return 0
+    if a.cmd in ("head", "verify") and not Path(a.log).is_file():
+        print(f"No such log file: {a.log}", file=sys.stderr)
+        return 2
     if a.cmd == "head":
         head = read_head(a.log)
         if head is None:
@@ -51,6 +56,10 @@ def main(argv=None) -> int:
             return 1
         print(head)
         return 0
+    if a.expect_head and not re.fullmatch(r"[0-9a-fA-F]{64}", a.expect_head.strip()):
+        print(f"--expect-head must be a 64-character SHA-256 hex digest, got {a.expect_head!r}",
+              file=sys.stderr)
+        return 2
     if a.expect_head:
         ok, problems = verify_against_anchor(a.log, a.expect_head)
     else:
