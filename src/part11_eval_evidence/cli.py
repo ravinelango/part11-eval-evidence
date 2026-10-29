@@ -7,12 +7,14 @@ import re
 import sys
 from pathlib import Path
 
+from . import __version__
 from .build import build
 from .chain import read_head, verify_against_anchor, verify_chain
 
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="p11e", description="Eval run -> audit-ready evidence package")
+    p.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     sub = p.add_subparsers(dest="cmd", required=True)
     b = sub.add_parser("build", help="build evidence package")
     b.add_argument("--results", required=True)

@@ -341,3 +341,12 @@ def test_promptfoo_same_test_id_across_providers_gets_column_suffix():
                                                    row(1, "mock:b", False)]}})
     assert [(r["test_id"], r["model"], r["verdict"]) for r in recs] == [
         ("PF-1/p0", "mock:a", "pass"), ("PF-1/p1", "mock:b", "fail")]
+
+
+def test_cli_version(capsys):
+    from part11_eval_evidence import __version__
+
+    with pytest.raises(SystemExit) as exc:
+        main(["--version"])
+    assert exc.value.code == 0
+    assert capsys.readouterr().out.strip() == f"p11e {__version__}"
