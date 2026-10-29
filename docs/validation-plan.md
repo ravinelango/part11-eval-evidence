@@ -42,7 +42,7 @@ Purpose: show the installed build matches what you intended to qualify.
 
 | Step | Action | Expected result | Evidence |
 |---|---|---|---|
-| IQ-1 | Record git commit SHA (or release tag) and `pip show` / lockfile hashes | SHA and package version match the approved build | Screenshot or log attached to the report |
+| IQ-1 | Record git commit SHA (or release tag), `p11e --version`, and `pip show` / lockfile hashes | SHA and package version match the approved build | Screenshot or log attached to the report |
 | IQ-2 | Confirm Python version is in the supported set (see CI / `pyproject.toml`) | Version matches the matrix you approved | `python --version` log |
 | IQ-3 | Install with the documented command (`pip install -e ".[dev]"` or pinned wheel) | `p11e --help` exits 0 | Command transcript |
 | IQ-4 | Confirm required entry points resolve (`p11e build`, `verify`, `head`) | Each prints help or usage without import errors | Transcript |
