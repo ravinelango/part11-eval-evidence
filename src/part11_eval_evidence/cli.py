@@ -39,6 +39,11 @@ def main(argv=None) -> int:
     a = p.parse_args(argv)
 
     if a.cmd == "build":
+        for flag, path in (("--results", a.results), ("--requirements", a.requirements),
+                           ("--config", a.config), ("--dispositions", a.dispositions)):
+            if path and not Path(path).is_file():
+                print(f"No such file for {flag}: {path}", file=sys.stderr)
+                return 2
         opts = ({"requirement_id": a.requirement_id, "min_kappa": a.min_kappa}
                 if a.format == "jck" else None)
         r = build(a.results, a.requirements, a.out, a.operator, a.config, a.format, a.run_id,

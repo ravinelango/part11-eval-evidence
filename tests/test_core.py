@@ -350,3 +350,12 @@ def test_cli_version(capsys):
         main(["--version"])
     assert exc.value.code == 0
     assert capsys.readouterr().out.strip() == f"p11e {__version__}"
+
+
+def test_cli_build_missing_input_exits_2(tmp_path, capsys):
+    missing = str(tmp_path / "nope.json")
+    rc = main(["build", "--results", missing, "--requirements", missing,
+               "--out", str(tmp_path / "out")])
+    assert rc == 2
+    assert "No such file for --results" in capsys.readouterr().err
+    assert not (tmp_path / "out").exists()
