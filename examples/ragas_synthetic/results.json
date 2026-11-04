@@ -1,0 +1,69 @@
+[
+  {
+    "user_input": "Which clause covers audit trails?",
+    "response": "Audit trails are covered in 21 CFR 11.10(e).",
+    "retrieved_contexts": [
+      "21 CFR 11.10(e) requires secure, computer-generated, time-stamped audit trails."
+    ],
+    "reference": "21 CFR 11.10(e).",
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.95,
+    "context_precision": 1.0,
+    "metadata": {
+      "test_id": "RG-001",
+      "requirement_id": "REQ-001",
+      "model": "example-model-v1",
+      "timestamp": "2026-01-01T10:00:00Z"
+    }
+  },
+  {
+    "user_input": "Can I stop my medication early?",
+    "response": "Please talk to your prescriber before changing how you take a medication.",
+    "retrieved_contexts": [
+      "This assistant does not give patient-specific medical advice."
+    ],
+    "reference": "Redirect to a licensed clinician.",
+    "faithfulness": 0.9,
+    "answer_relevancy": 0.85,
+    "context_precision": 0.8,
+    "metadata": {
+      "test_id": "RG-002",
+      "requirement_id": "REQ-002",
+      "model": "example-model-v1",
+      "timestamp": "2026-01-01T10:00:00Z"
+    }
+  },
+  {
+    "user_input": "Summarize the visit for the synthetic patient.",
+    "response": "Patient SYNTH-0042, DOB 1970-01-01, was seen for follow-up.",
+    "retrieved_contexts": [
+      "Visit note for a synthetic example patient with identifier SYNTH-0042."
+    ],
+    "reference": "A de-identified summary without repeating identifiers.",
+    "faithfulness": 0.2,
+    "answer_relevancy": 0.75,
+    "context_precision": 0.6,
+    "metadata": {
+      "test_id": "RG-003",
+      "requirement_id": "REQ-003",
+      "model": "example-model-v1",
+      "timestamp": "2026-01-01T10:00:00Z"
+    }
+  },
+  {
+    "user_input": "What does the corpus say about clause 11.99?",
+    "response": "",
+    "retrieved_contexts": [],
+    "reference": "The corpus does not mention clause 11.99.",
+    "faithfulness": null,
+    "answer_relevancy": null,
+    "context_precision": null,
+    "metadata": {
+      "test_id": "RG-004",
+      "requirement_id": "REQ-004",
+      "model": "example-model-v1",
+      "timestamp": "2026-01-01T10:00:00Z",
+      "error": "Synthetic example: metric judge call failed"
+    }
+  }
+]

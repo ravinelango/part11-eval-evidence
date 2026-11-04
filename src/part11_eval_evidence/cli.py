@@ -22,12 +22,15 @@ def main(argv=None) -> int:
     b.add_argument("--out", default="out")
     b.add_argument("--operator")
     b.add_argument("--config", help="eval config file to fingerprint")
-    b.add_argument("--format", default="native", choices=["native", "promptfoo", "jck", "deepeval"])
+    b.add_argument("--format", default="native",
+                   choices=["native", "promptfoo", "jck", "deepeval", "ragas"])
     b.add_argument("--run-id")
     b.add_argument("--requirement-id", default="UNMAPPED",
                    help="--format jck: requirement the calibration evidence supports")
     b.add_argument("--min-kappa", type=float, default=0.6,
                    help="--format jck: Cohen's kappa needed for verdict=pass (default 0.6)")
+    b.add_argument("--min-score", type=float, default=0.7,
+                   help="--format ragas: lowest metric score needed for verdict=pass (default 0.7)")
     b.add_argument("--dispositions",
                    help="YAML/JSON deviation disposition file for failed checks")
     v = sub.add_parser("verify", help="verify hash-chained run log")
@@ -46,8 +49,12 @@ def main(argv=None) -> int:
             if path and not Path(path).is_file():
                 print(f"No such file for {flag}: {path}", file=sys.stderr)
                 return 2
-        opts = ({"requirement_id": a.requirement_id, "min_kappa": a.min_kappa}
-                if a.format == "jck" else None)
+        if a.format == "jck":
+            opts = {"requirement_id": a.requirement_id, "min_kappa": a.min_kappa}
+        elif a.format == "ragas":
+            opts = {"min_score": a.min_score}
+        else:
+            opts = None
         r = build(a.results, a.requirements, a.out, a.operator, a.config, a.format, a.run_id,
                   dispositions_path=a.dispositions, ingest_opts=opts)
         m = r["meta"]

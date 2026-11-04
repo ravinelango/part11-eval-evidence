@@ -5,7 +5,8 @@ Native schema (one JSON object per line, or a JSON array):
   score (optional float), model, timestamp (ISO 8601).
 Adapters: promptfoo `--output results.json` / `.jsonl`,
 judge-calibration-kit (`jck run|agree|ab --json`) summaries,
-DeepEval test-run files or test case lists (snake_case or camelCase).
+DeepEval test-run files or test case lists (snake_case or camelCase),
+Ragas `EvaluationResult.to_pandas().to_dict("records")` / JSONL rows.
 """
 
 from __future__ import annotations
@@ -217,8 +218,79 @@ def from_jck(data: dict, requirement_id: str = "UNMAPPED",
     raise SchemaError(f"unknown jck summary mode {mode!r}; expected judge, human_human or ab")
 
 
+DEFAULT_MIN_SCORE = 0.7
+
+# Columns that are sample fields / ids, not Ragas metric scores.
+_RAGAS_NON_METRIC = {
+    "user_input", "question", "response", "answer", "retrieved_contexts", "contexts",
+    "reference", "ground_truth", "reference_contexts", "reference_context",
+    "rubrics", "metadata", "test_id", "requirement_id", "model", "timestamp", "error",
+}
+
+
+def _ragas_rows(data) -> list[dict]:
+    """Records from a to_pandas().to_dict("records") dump, a scores-only list, or JSONL."""
+    if isinstance(data, dict):
+        if "scores" in data and isinstance(data["scores"], list):
+            return data["scores"]
+        raise SchemaError("ragas export must be a list of records or {\"scores\": [...]}")
+    return data
+
+
+def _ragas_metrics(row: dict) -> list[float | None]:
+    """Collect metric values: prefer known float columns outside the sample/id set."""
+    meta = row.get("metadata") if isinstance(row.get("metadata"), dict) else {}
+    skip = _RAGAS_NON_METRIC | set(meta)
+    out: list[float | None] = []
+    for k, v in row.items():
+        if k in skip:
+            continue
+        if v is None:
+            out.append(None)
+        elif isinstance(v, bool):
+            continue
+        elif isinstance(v, (int, float)):
+            out.append(float(v))
+    return out
+
+
+def from_ragas(data, min_score: float = DEFAULT_MIN_SCORE) -> list[dict]:
+    """Map Ragas evaluation rows to the native schema.
+
+    Accepts the list produced by `EvaluationResult.to_pandas().to_dict("records")` (sample
+    columns plus metric columns), the same rows as JSONL, or a `{"scores": [...]}` object.
+    `requirement_id` / `test_id` / `model` / `timestamp` come from a `metadata` object or
+    matching top-level fields. `score` is the lowest metric; `verdict` is `error` when any
+    metric is null or the row carries `error`, otherwise `pass` when every metric is at least
+    `min_score` and `fail` below it.
+    """
+    recs = []
+    for i, row in enumerate(_ragas_rows(data)):
+        meta = row.get("metadata") if isinstance(row.get("metadata"), dict) else {}
+        metrics = _ragas_metrics(row)
+        explicit_err = row.get("error") or meta.get("error")
+        if explicit_err or not metrics or any(m is None for m in metrics):
+            verdict = "error"
+            score = None
+        else:
+            score = min(metrics)  # type: ignore[arg-type]
+            verdict = "pass" if score >= min_score else "fail"
+        recs.append({
+            "test_id": meta.get("test_id") or row.get("test_id") or f"rg-{i}",
+            "requirement_id": meta.get("requirement_id") or row.get("requirement_id", "UNMAPPED"),
+            "input": row.get("user_input") or row.get("question") or "",
+            "output": row.get("response") or row.get("answer") or "",
+            "verdict": verdict,
+            "score": score,
+            "model": meta.get("model") or row.get("model", "unknown"),
+            "timestamp": meta.get("timestamp") or row.get("timestamp", "unknown"),
+        })
+    return recs
+
+
 def load_results(path: str | Path, fmt: str = "native", requirement_id: str = "UNMAPPED",
-                 min_kappa: float = DEFAULT_MIN_KAPPA) -> list[dict]:
+                 min_kappa: float = DEFAULT_MIN_KAPPA,
+                 min_score: float = DEFAULT_MIN_SCORE) -> list[dict]:
     data = _read(Path(path))
     if fmt == "promptfoo":
         data = from_promptfoo(data)
@@ -226,6 +298,8 @@ def load_results(path: str | Path, fmt: str = "native", requirement_id: str = "U
         data = from_jck(data, requirement_id, min_kappa)
     elif fmt == "deepeval":
         data = from_deepeval(data)
+    elif fmt == "ragas":
+        data = from_ragas(data, min_score)
     elif isinstance(data, dict):
         data = [data]
     recs = [normalize(r) for r in data]

@@ -16,6 +16,7 @@ from part11_eval_evidence.ingest import (
     from_deepeval,
     from_jck,
     from_promptfoo,
+    from_ragas,
     load_results,
     normalize,
 )
@@ -339,6 +340,50 @@ def test_build_from_deepeval_fixture(tmp_path):
     assert r["meta"]["n_tests"] == 4
     assert "Test DE-003 (REQ-003): verdict FAIL" in r["deviations"]
     assert "Test DE-004 (REQ-004): verdict ERROR" in r["deviations"]
+
+
+RG_DIR = Path(__file__).parent.parent / "examples" / "ragas_synthetic"
+
+
+def test_ragas_records_and_null_metrics():
+    rows = [
+        {"user_input": "q1", "response": "a1", "faithfulness": 0.9, "answer_relevancy": 0.8,
+         "metadata": {"test_id": "RG-A", "requirement_id": "REQ-001", "model": "m1"}},
+        {"user_input": "q2", "response": "a2", "faithfulness": 0.2, "answer_relevancy": 0.9,
+         "test_id": "RG-B", "requirement_id": "REQ-003"},
+        {"user_input": "q3", "response": "", "faithfulness": None, "answer_relevancy": 0.5,
+         "metadata": {"test_id": "RG-C", "error": "judge failed"}},
+    ]
+    recs = [normalize(r) for r in from_ragas(rows)]
+    assert [r["verdict"] for r in recs] == ["pass", "fail", "error"]
+    assert recs[0]["score"] == 0.8 and recs[0]["model"] == "m1"
+    assert recs[1]["score"] == 0.2 and recs[1]["requirement_id"] == "REQ-003"
+    assert recs[2]["score"] is None
+    # scores-only wrapper + stricter threshold
+    wrapped = from_ragas({"scores": [{"faithfulness": 0.75}]}, min_score=0.8)
+    assert wrapped[0]["verdict"] == "fail" and wrapped[0]["test_id"] == "rg-0"
+
+
+def test_build_from_ragas_fixture(tmp_path):
+    recs = load_results(RG_DIR / "results.json", fmt="ragas")
+    assert [r["test_id"] for r in recs] == ["RG-001", "RG-002", "RG-003", "RG-004"]
+    assert [r["verdict"] for r in recs] == ["pass", "pass", "fail", "error"]
+    assert recs[2]["score"] == 0.2 and recs[3]["score"] is None
+    r = build(RG_DIR / "results.json", EX / "requirements.yaml", tmp_path, fmt="ragas",
+              run_id="rg-test", now="2026-01-01T00:00:00Z", ingest_opts={"min_score": 0.7})
+    assert r["meta"]["n_tests"] == 4
+    assert "Test RG-003 (REQ-003): verdict FAIL" in r["deviations"]
+    assert "Test RG-004 (REQ-004): verdict ERROR" in r["deviations"]
+
+
+def test_cli_build_from_ragas_fixture(tmp_path, capsys):
+    rc = main(["build", "--format", "ragas", "--results", str(RG_DIR / "results.json"),
+               "--requirements", str(EX / "requirements.yaml"), "--out", str(tmp_path / "out"),
+               "--run-id", "rg-cli", "--min-score", "0.7"])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "4 tests" in out and "2 deviations" in out
+
 
 
 def test_duplicate_test_ids_are_rejected(tmp_path):
