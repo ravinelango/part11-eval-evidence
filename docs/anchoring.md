@@ -38,10 +38,21 @@ package later.
 p11e verify out/run_log.jsonl --expect-head <recorded-sha256>
 ```
 
+If the head was saved to a file (for example `p11e head out/run_log.jsonl > run-42.head`),
+pass the file instead of pasting the value:
+
+```bash
+p11e verify out/run_log.jsonl --expect-head-file run-42.head
+```
+
+The first non-blank line is used, and anything after the hash on that line is ignored, so a
+`sha256sum`-style `<hash>  <name>` line works too.
+
 Exit code `0` means the chain is intact **and** its head matches the recorded value.
 Exit code `1` lists every problem found, including a head mismatch.
 Exit code `2` means the check never ran: the log file is missing or the recorded value is
-not a 64-character SHA-256 hex digest (for example, a truncated copy-paste).
+not a 64-character SHA-256 hex digest (for example, a truncated copy-paste), or the
+`--expect-head-file` is missing or empty.
 
 ## What this does and doesn't give you
 
