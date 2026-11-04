@@ -34,6 +34,8 @@ def main(argv=None) -> int:
     v.add_argument("log")
     v.add_argument("--expect-head", metavar="SHA256",
                    help="chain head recorded outside the log; fails if it differs")
+    v.add_argument("--expect-head-file", metavar="PATH",
+                   help="read the recorded chain head from the first non-blank line of PATH")
     h = sub.add_parser("head", help="print the chain head hash to record externally")
     h.add_argument("log")
     a = p.parse_args(argv)
@@ -63,6 +65,19 @@ def main(argv=None) -> int:
             return 1
         print(head)
         return 0
+    if a.expect_head and a.expect_head_file:
+        print("Use either --expect-head or --expect-head-file, not both", file=sys.stderr)
+        return 2
+    if a.expect_head_file:
+        anchor = Path(a.expect_head_file)
+        if not anchor.is_file():
+            print(f"No such file for --expect-head-file: {anchor}", file=sys.stderr)
+            return 2
+        lines = [ln.strip() for ln in anchor.read_text(encoding="utf-8").splitlines() if ln.strip()]
+        a.expect_head = lines[0].split()[0] if lines else ""
+        if not a.expect_head:
+            print(f"--expect-head-file {anchor} is empty", file=sys.stderr)
+            return 2
     if a.expect_head and not re.fullmatch(r"[0-9a-fA-F]{64}", a.expect_head.strip()):
         print(f"--expect-head must be a 64-character SHA-256 hex digest, got {a.expect_head!r}",
               file=sys.stderr)

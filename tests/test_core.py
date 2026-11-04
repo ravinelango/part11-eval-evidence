@@ -128,6 +128,24 @@ def test_cli_missing_log_and_bad_anchor(tmp_path, capsys):
     assert "64-character" in capsys.readouterr().err
 
 
+def test_cli_expect_head_file(tmp_path, capsys):
+    r = _build(tmp_path)
+    log = str(tmp_path / "run_log.jsonl")
+    anchor = tmp_path / "anchor.txt"
+    # `p11e head log > anchor.txt` output, or `sha256sum`-style "<hash>  <name>" lines.
+    anchor.write_text(f"\n{r['meta']['chain_head']}  run_log.jsonl\n", encoding="utf-8")
+    assert main(["verify", log, "--expect-head-file", str(anchor)]) == 0
+    anchor.write_text("0" * 64 + "\n", encoding="utf-8")
+    assert main(["verify", log, "--expect-head-file", str(anchor)]) == 1
+    capsys.readouterr()
+    anchor.write_text("\n\n", encoding="utf-8")
+    assert main(["verify", log, "--expect-head-file", str(anchor)]) == 2
+    assert "is empty" in capsys.readouterr().err
+    assert main(["verify", log, "--expect-head-file", str(tmp_path / "nope.txt")]) == 2
+    assert main(["verify", log, "--expect-head", "0" * 64,
+                 "--expect-head-file", str(anchor)]) == 2
+
+
 def test_promptfoo_adapter():
     data = {"createdAt": "2026-01-01", "results": {"results": [
         {"vars": {"q": "hi"}, "response": {"output": "hello"}, "success": True, "score": 1,
