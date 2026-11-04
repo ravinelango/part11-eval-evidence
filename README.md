@@ -57,6 +57,16 @@ Agreement, the kappa CI and the confusion matrix are kept in the record's output
 is yours to justify; 0.6 is a common starting point, not a regulatory number. Synthetic
 summaries from jck's mock judges are in [`examples/jck_synthetic/`](examples/jck_synthetic/).
 
+`--format ragas` reads a [Ragas](https://docs.ragas.io/) evaluation export in the shape of
+`EvaluationResult.to_pandas().to_dict("records")` (or the same rows as JSONL / a
+`{"scores": [...]}` object). Put `requirement_id` / `test_id` / `model` / `timestamp` in a
+`metadata` object or as flat columns. `score` is the lowest metric; `verdict` is `pass` when
+every metric is at least `--min-score` (default 0.7), `fail` below it, and `error` when any
+metric is null or the row carries `error`. The threshold is yours to justify; 0.7 is a common
+starting point, not a regulatory number. The fixture in
+[`examples/ragas_synthetic/`](examples/ragas_synthetic/) is hand-written synthetic data in that
+shape, not output from a real run.
+
 ## Input schema (native)
 
 JSONL, one object per line (or a JSON array):
