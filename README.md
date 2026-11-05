@@ -63,7 +63,8 @@ summaries from jck's mock judges are in [`examples/jck_synthetic/`](examples/jck
 `metadata` object or as flat columns. `score` is the lowest metric; `verdict` is `pass` when
 every metric is at least `--min-score` (default 0.7), `fail` below it, and `error` when any
 metric is null or the row carries `error`. The threshold is yours to justify; 0.7 is a common
-starting point, not a regulatory number. The fixture in
+starting point, not a regulatory number. `build` exits 2 if `--min-kappa` is outside [-1, 1]
+or `--min-score` is outside [0, 1] (for example `70` typed instead of `0.7`). The fixture in
 [`examples/ragas_synthetic/`](examples/ragas_synthetic/) is hand-written synthetic data in that
 shape, not output from a real run.
 
