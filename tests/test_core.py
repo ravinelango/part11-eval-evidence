@@ -422,3 +422,14 @@ def test_cli_build_missing_input_exits_2(tmp_path, capsys):
     assert rc == 2
     assert "No such file for --results" in capsys.readouterr().err
     assert not (tmp_path / "out").exists()
+
+
+@pytest.mark.parametrize("flag,value", [("--min-kappa", "1.5"), ("--min-kappa", "-2"),
+                                        ("--min-score", "70"), ("--min-score", "-0.1")])
+def test_cli_build_rejects_out_of_range_thresholds(tmp_path, capsys, flag, value):
+    rc = main(["build", "--format", "ragas", "--results", str(RG_DIR / "results.json"),
+               "--requirements", str(EX / "requirements.yaml"),
+               "--out", str(tmp_path / "out"), flag, value])
+    assert rc == 2
+    assert f"{flag} must be between" in capsys.readouterr().err
+    assert not (tmp_path / "out").exists()

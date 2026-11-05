@@ -49,6 +49,13 @@ def main(argv=None) -> int:
             if path and not Path(path).is_file():
                 print(f"No such file for {flag}: {path}", file=sys.stderr)
                 return 2
+        if not -1.0 <= a.min_kappa <= 1.0:
+            print(f"--min-kappa must be between -1 and 1 (Cohen's kappa range), got {a.min_kappa}",
+                  file=sys.stderr)
+            return 2
+        if not 0.0 <= a.min_score <= 1.0:
+            print(f"--min-score must be between 0 and 1, got {a.min_score}", file=sys.stderr)
+            return 2
         if a.format == "jck":
             opts = {"requirement_id": a.requirement_id, "min_kappa": a.min_kappa}
         elif a.format == "ragas":
