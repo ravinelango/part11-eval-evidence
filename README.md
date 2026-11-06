@@ -68,6 +68,16 @@ or `--min-score` is outside [0, 1] (for example `70` typed instead of `0.7`). Th
 [`examples/ragas_synthetic/`](examples/ragas_synthetic/) is hand-written synthetic data in that
 shape, not output from a real run.
 
+`--format inspect` reads an [Inspect AI](https://inspect.aisi.org.uk/eval-logs.html) eval-log JSON
+export (`inspect eval --log-format=json` or `inspect log dump`), a `{"samples": [...]}` wrapper, or
+a bare list of samples. Put `requirement_id` / `test_id` / `model` / `timestamp` in sample
+`metadata`. `score` is the lowest numeric score (`C`/`I` string scores map to 1.0/0.0);
+`verdict` is `pass` when every score is at least `--min-score` (default 0.7), `fail` below it, and
+`error` when the sample has an `error` field or a score value cannot be read. The threshold is
+yours to justify; 0.7 is a common starting point, not a regulatory number. The fixture in
+[`examples/inspect_synthetic/`](examples/inspect_synthetic/) is hand-written synthetic data in that
+shape, not output from a real run.
+
 ## Input schema (native)
 
 JSONL, one object per line (or a JSON array):
