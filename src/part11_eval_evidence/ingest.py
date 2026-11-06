@@ -6,7 +6,8 @@ Native schema (one JSON object per line, or a JSON array):
 Adapters: promptfoo `--output results.json` / `.jsonl`,
 judge-calibration-kit (`jck run|agree|ab --json`) summaries,
 DeepEval test-run files or test case lists (snake_case or camelCase),
-Ragas `EvaluationResult.to_pandas().to_dict("records")` / JSONL rows.
+Ragas `EvaluationResult.to_pandas().to_dict("records")` / JSONL rows,
+Inspect AI eval-log JSON (`--log-format=json` / `inspect log dump`) or sample lists.
 """
 
 from __future__ import annotations
@@ -288,6 +289,138 @@ def from_ragas(data, min_score: float = DEFAULT_MIN_SCORE) -> list[dict]:
     return recs
 
 
+
+def _inspect_samples(data) -> tuple[list[dict], dict]:
+    """Return (samples, eval_spec) from an EvalLog object, {samples: [...]}, or bare list."""
+    if isinstance(data, list):
+        return data, {}
+    if isinstance(data, dict):
+        if "samples" in data:
+            samples = data.get("samples") or []
+            if not isinstance(samples, list):
+                raise SchemaError("inspect export samples must be a list")
+            return samples, data.get("eval") or {}
+        raise SchemaError(
+            'inspect export must be an EvalLog object with "samples", '
+            'a {"samples": [...]} wrapper, or a bare list of samples'
+        )
+    raise SchemaError("inspect export must be a JSON object or array")
+
+
+def _inspect_input(sample: dict) -> str:
+    inp = sample.get("input", "")
+    if isinstance(inp, str):
+        return inp
+    return json.dumps(inp, sort_keys=True)
+
+
+def _inspect_output(sample: dict) -> str:
+    out = sample.get("output") or {}
+    if isinstance(out, str):
+        return out
+    if out.get("completion"):
+        return str(out["completion"])
+    choices = out.get("choices") or []
+    if choices:
+        msg = (choices[0] or {}).get("message") or {}
+        content = msg.get("content", "")
+        if isinstance(content, str):
+            return content
+        return json.dumps(content, sort_keys=True) if content else ""
+    return ""
+
+
+def _inspect_score_number(value) -> float | None:
+    """Map a Score.value (or nested dict leaf) to a float in [0, 1] when possible."""
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return 1.0 if value else 0.0
+    if isinstance(value, (int, float)):
+        if isinstance(value, float) and math.isnan(value):
+            return None
+        return float(value)
+    if isinstance(value, str):
+        key = value.strip().lower()
+        if key in {"c", "correct", "pass", "true", "yes"}:
+            return 1.0
+        if key in {"i", "incorrect", "fail", "false", "no"}:
+            return 0.0
+        if key in {"p", "partial"}:
+            return 0.5
+        try:
+            return float(value)
+        except ValueError:
+            return None
+    if isinstance(value, dict):
+        for k in ("accuracy", "correct", "score", "value"):
+            if k in value:
+                return _inspect_score_number(value[k])
+        for v in value.values():
+            n = _inspect_score_number(v)
+            if n is not None:
+                return n
+        return None
+    return None
+
+
+def from_inspect(data, min_score: float = DEFAULT_MIN_SCORE) -> list[dict]:
+    """Map Inspect AI eval-log / sample JSON to the native schema.
+
+    Accepts a full EvalLog JSON object (`inspect eval --log-format=json` or
+    `inspect log dump`), a `{"samples": [...]}` wrapper, or a bare list of
+    EvalSample-like objects. `requirement_id` / `test_id` / `model` /
+    `timestamp` come from sample `metadata` when present; otherwise `test_id`
+    falls back to the sample `id` (with `/e<epoch>` when epoch > 1), `model`
+    and `timestamp` fall back to `eval.model` / `eval.created`.
+
+    `verdict` is `error` when the sample has an `error` field or any score
+    value cannot be read as a number; otherwise `pass` when every score is at
+    least `min_score` and `fail` below it. `score` is the lowest numeric score.
+    """
+    samples, ev = _inspect_samples(data)
+    recs = []
+    for i, sample in enumerate(samples):
+        if not isinstance(sample, dict):
+            raise SchemaError(f"inspect sample at index {i} must be an object")
+        meta = sample.get("metadata") if isinstance(sample.get("metadata"), dict) else {}
+        sid = sample.get("id", i)
+        epoch = sample.get("epoch") or 1
+        default_tid = f"{sid}/e{epoch}" if epoch and int(epoch) > 1 else str(sid)
+        err = sample.get("error")
+        scores = sample.get("scores") or {}
+        nums: list[float | None] = []
+        if isinstance(scores, dict):
+            for sc in scores.values():
+                val = sc.get("value") if isinstance(sc, dict) else sc
+                nums.append(_inspect_score_number(val))
+        if err:
+            verdict, score = "error", None
+        elif not nums or any(n is None for n in nums):
+            verdict, score = "error", None
+        else:
+            score = min(nums)  # type: ignore[arg-type]
+            verdict = "pass" if score >= min_score else "fail"
+        out_model = (sample.get("output") or {})
+        model = (
+            meta.get("model")
+            or (out_model.get("model") if isinstance(out_model, dict) else None)
+            or ev.get("model")
+            or "unknown"
+        )
+        recs.append({
+            "test_id": meta.get("test_id") or default_tid,
+            "requirement_id": meta.get("requirement_id", "UNMAPPED"),
+            "input": _inspect_input(sample),
+            "output": _inspect_output(sample),
+            "verdict": verdict,
+            "score": score,
+            "model": model,
+            "timestamp": meta.get("timestamp") or ev.get("created") or "unknown",
+        })
+    return recs
+
+
 def load_results(path: str | Path, fmt: str = "native", requirement_id: str = "UNMAPPED",
                  min_kappa: float = DEFAULT_MIN_KAPPA,
                  min_score: float = DEFAULT_MIN_SCORE) -> list[dict]:
@@ -300,6 +433,8 @@ def load_results(path: str | Path, fmt: str = "native", requirement_id: str = "U
         data = from_deepeval(data)
     elif fmt == "ragas":
         data = from_ragas(data, min_score)
+    elif fmt == "inspect":
+        data = from_inspect(data, min_score)
     elif isinstance(data, dict):
         data = [data]
     recs = [normalize(r) for r in data]

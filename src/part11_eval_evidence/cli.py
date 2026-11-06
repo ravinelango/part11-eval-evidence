@@ -23,14 +23,14 @@ def main(argv=None) -> int:
     b.add_argument("--operator")
     b.add_argument("--config", help="eval config file to fingerprint")
     b.add_argument("--format", default="native",
-                   choices=["native", "promptfoo", "jck", "deepeval", "ragas"])
+                   choices=["native", "promptfoo", "jck", "deepeval", "ragas", "inspect"])
     b.add_argument("--run-id")
     b.add_argument("--requirement-id", default="UNMAPPED",
                    help="--format jck: requirement the calibration evidence supports")
     b.add_argument("--min-kappa", type=float, default=0.6,
                    help="--format jck: Cohen's kappa needed for verdict=pass (default 0.6)")
     b.add_argument("--min-score", type=float, default=0.7,
-                   help="--format ragas: lowest metric score needed for verdict=pass (default 0.7)")
+                   help="--format ragas|inspect: lowest score for verdict=pass (default 0.7)")
     b.add_argument("--dispositions",
                    help="YAML/JSON deviation disposition file for failed checks")
     v = sub.add_parser("verify", help="verify hash-chained run log")
@@ -58,7 +58,7 @@ def main(argv=None) -> int:
             return 2
         if a.format == "jck":
             opts = {"requirement_id": a.requirement_id, "min_kappa": a.min_kappa}
-        elif a.format == "ragas":
+        elif a.format in ("ragas", "inspect"):
             opts = {"min_score": a.min_score}
         else:
             opts = None

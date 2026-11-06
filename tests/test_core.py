@@ -14,6 +14,7 @@ from part11_eval_evidence.dispositions import (
 from part11_eval_evidence.ingest import (
     SchemaError,
     from_deepeval,
+    from_inspect,
     from_jck,
     from_promptfoo,
     from_ragas,
@@ -384,6 +385,52 @@ def test_cli_build_from_ragas_fixture(tmp_path, capsys):
     out = capsys.readouterr().out
     assert "4 tests" in out and "2 deviations" in out
 
+
+INS_DIR = Path(__file__).parent.parent / "examples" / "inspect_synthetic"
+
+
+def test_inspect_samples_scores_and_errors():
+    samples = [
+        {"id": "a", "input": "q1", "output": {"completion": "ok"},
+         "scores": {"exact": {"value": 1.0}},
+         "metadata": {"test_id": "INS-A", "requirement_id": "REQ-001", "model": "m1"}},
+        {"id": "b", "input": "q2", "output": {"completion": "no"},
+         "scores": {"exact": {"value": "I"}},
+         "metadata": {"test_id": "INS-B", "requirement_id": "REQ-003"}},
+        {"id": "c", "epoch": 2, "input": "q3", "output": {"completion": ""},
+         "scores": {}, "error": {"message": "timeout"}},
+    ]
+    recs = [normalize(r) for r in from_inspect(samples)]
+    assert [r["verdict"] for r in recs] == ["pass", "fail", "error"]
+    assert recs[0]["score"] == 1.0 and recs[0]["model"] == "m1"
+    assert recs[1]["score"] == 0.0 and recs[1]["requirement_id"] == "REQ-003"
+    assert recs[2]["test_id"] == "c/e2" and recs[2]["score"] is None
+    # missing/unreadable top-level shape
+    with pytest.raises(SchemaError, match="inspect export must"):
+        from_inspect({"status": "success"})
+    with pytest.raises(SchemaError, match="inspect export must"):
+        from_inspect(42)  # type: ignore[arg-type]
+
+
+def test_build_from_inspect_fixture(tmp_path):
+    recs = load_results(INS_DIR / "eval_log.json", fmt="inspect")
+    assert [r["test_id"] for r in recs] == ["INS-001", "INS-002", "INS-003", "INS-004"]
+    assert [r["verdict"] for r in recs] == ["pass", "pass", "fail", "error"]
+    assert recs[1]["score"] == 1.0 and recs[2]["score"] == 0.0 and recs[3]["score"] is None
+    r = build(INS_DIR / "eval_log.json", EX / "requirements.yaml", tmp_path, fmt="inspect",
+              run_id="ins-test", now="2026-01-01T00:00:00Z", ingest_opts={"min_score": 0.7})
+    assert r["meta"]["n_tests"] == 4
+    assert "Test INS-003 (REQ-003): verdict FAIL" in r["deviations"]
+    assert "Test INS-004 (REQ-004): verdict ERROR" in r["deviations"]
+
+
+def test_cli_build_from_inspect_fixture(tmp_path, capsys):
+    rc = main(["build", "--format", "inspect", "--results", str(INS_DIR / "eval_log.json"),
+               "--requirements", str(EX / "requirements.yaml"), "--out", str(tmp_path / "out"),
+               "--run-id", "ins-cli", "--min-score", "0.7"])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "4 tests" in out and "2 deviations" in out
 
 
 def test_duplicate_test_ids_are_rejected(tmp_path):
