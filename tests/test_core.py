@@ -480,3 +480,20 @@ def test_cli_build_rejects_out_of_range_thresholds(tmp_path, capsys, flag, value
     assert rc == 2
     assert f"{flag} must be between" in capsys.readouterr().err
     assert not (tmp_path / "out").exists()
+
+
+MOCKLLM_LOG = Path(__file__).parent.parent / "examples" / "inspect_mockllm_run" / "eval_log.json"
+
+
+def test_build_from_real_inspect_mockllm_log(tmp_path):
+    # Unedited log from `inspect eval --model mockllm/model` (inspect_ai 0.3.289).
+    recs = load_results(MOCKLLM_LOG, fmt="inspect")
+    assert [r["test_id"] for r in recs] == ["SYN-1", "SYN-2", "SYN-3"]
+    assert [r["verdict"] for r in recs] == ["pass", "fail", "fail"]
+    assert [r["requirement_id"] for r in recs] == ["REQ-001", "REQ-004", "REQ-004"]
+    assert all(r["model"] == "mockllm" for r in recs)
+    r = build(MOCKLLM_LOG, EX / "requirements.yaml", tmp_path, fmt="inspect",
+              run_id="mockllm-test", now="2026-01-01T00:00:00Z")
+    assert r["meta"]["n_tests"] == 3
+    assert "Test SYN-2 (REQ-004): verdict FAIL" in r["deviations"]
+    assert "Requirement REQ-002: NOT TESTED" in r["deviations"]
