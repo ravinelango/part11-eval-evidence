@@ -67,7 +67,10 @@ def _pf_rows(data) -> tuple[list[dict], str | None]:
 
 
 def _pf_verdict(r: dict) -> str:
-    if r.get("error") or r.get("failureReason") == _PF_ERROR:
+    # Real exports also fill `error` with the assertion message when failureReason == 1,
+    # so `error` only means a provider/runtime error when failureReason is absent.
+    reason = r.get("failureReason")
+    if reason == _PF_ERROR or (reason is None and r.get("error")):
         return "error"
     if r.get("success"):
         return "pass"

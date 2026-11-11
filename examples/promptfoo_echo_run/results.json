@@ -1,0 +1,580 @@
+{
+  "evalId": "eval-gnl-2026-11-11T20:47:48",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-11-11T20:47:48.204Z",
+    "prompts": [
+      {
+        "id": "d3bcaf71c11c2678899be04d872718325f0916b3b0705e805ee29930663a42e2",
+        "raw": "{{question}}",
+        "label": "{{question}}",
+        "provider": "echo",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 2,
+          "testErrorCount": 0,
+          "testCacheHitCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 2,
+          "totalLatencyMs": 9,
+          "tokenUsage": {
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "total": 0,
+            "numRequests": 3,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "namedScores": {},
+          "namedScoresCount": {},
+          "namedScoreWeights": {},
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "icontains",
+                "value": "section"
+              }
+            }
+          ]
+        },
+        "id": "67fc88c6-fa2b-418e-99ee-84fc03d2ad0c",
+        "latencyMs": 5,
+        "namedScores": {},
+        "prompt": {
+          "raw": "Per Section 4.2 of the synthetic guidance, how often is the device recalibrated?",
+          "label": "{{question}}",
+          "config": {}
+        },
+        "promptId": "d3bcaf71c11c2678899be04d872718325f0916b3b0705e805ee29930663a42e2",
+        "promptIdx": 0,
+        "provider": {
+          "id": "echo",
+          "label": ""
+        },
+        "response": {
+          "output": "Per Section 4.2 of the synthetic guidance, how often is the device recalibrated?",
+          "raw": "Per Section 4.2 of the synthetic guidance, how often is the device recalibrated?",
+          "cost": 0,
+          "cached": false,
+          "tokenUsage": {
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "total": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "isRefusal": false,
+          "metadata": {}
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "vars": {
+            "question": "Per Section 4.2 of the synthetic guidance, how often is the device recalibrated?"
+          },
+          "assert": [
+            {
+              "type": "icontains",
+              "value": "section"
+            }
+          ],
+          "metadata": {
+            "test_id": "PF-ECHO-1",
+            "requirement_id": "REQ-001"
+          },
+          "options": {}
+        },
+        "testIdx": 0,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "question": "Per Section 4.2 of the synthetic guidance, how often is the device recalibrated?"
+        },
+        "metadata": {
+          "test_id": "PF-ECHO-1",
+          "requirement_id": "REQ-001",
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "error": "Expected output to contain \"section\"",
+        "gradingResult": {
+          "pass": false,
+          "score": 0,
+          "reason": "Expected output to contain \"section\"",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": false,
+              "score": 0,
+              "reason": "Expected output to contain \"section\"",
+              "assertion": {
+                "type": "icontains",
+                "value": "section"
+              }
+            }
+          ]
+        },
+        "id": "1e62ae4d-e5ad-49d0-a9d3-7e246ba6cd39",
+        "latencyMs": 2,
+        "namedScores": {},
+        "prompt": {
+          "raw": "What is the recalibration interval for the synthetic device?",
+          "label": "{{question}}",
+          "config": {}
+        },
+        "promptId": "d3bcaf71c11c2678899be04d872718325f0916b3b0705e805ee29930663a42e2",
+        "promptIdx": 0,
+        "provider": {
+          "id": "echo",
+          "label": ""
+        },
+        "response": {
+          "output": "What is the recalibration interval for the synthetic device?",
+          "raw": "What is the recalibration interval for the synthetic device?",
+          "cost": 0,
+          "cached": false,
+          "tokenUsage": {
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "total": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "isRefusal": false,
+          "metadata": {}
+        },
+        "score": 0,
+        "success": false,
+        "testCase": {
+          "vars": {
+            "question": "What is the recalibration interval for the synthetic device?"
+          },
+          "assert": [
+            {
+              "type": "icontains",
+              "value": "section"
+            }
+          ],
+          "metadata": {
+            "test_id": "PF-ECHO-2",
+            "requirement_id": "REQ-001"
+          },
+          "options": {}
+        },
+        "testIdx": 1,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "question": "What is the recalibration interval for the synthetic device?"
+        },
+        "metadata": {
+          "test_id": "PF-ECHO-2",
+          "requirement_id": "REQ-001",
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 1
+      },
+      {
+        "cost": 0,
+        "error": "Expected output to contain \"not in the provided documents\"",
+        "gradingResult": {
+          "pass": false,
+          "score": 0,
+          "reason": "Expected output to contain \"not in the provided documents\"",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": false,
+              "score": 0,
+              "reason": "Expected output to contain \"not in the provided documents\"",
+              "assertion": {
+                "type": "icontains",
+                "value": "not in the provided documents"
+              }
+            }
+          ]
+        },
+        "id": "9b5d947c-3361-4b30-abd1-776499372f0b",
+        "latencyMs": 2,
+        "namedScores": {},
+        "prompt": {
+          "raw": "What does the synthetic corpus say about pediatric dosing?",
+          "label": "{{question}}",
+          "config": {}
+        },
+        "promptId": "d3bcaf71c11c2678899be04d872718325f0916b3b0705e805ee29930663a42e2",
+        "promptIdx": 0,
+        "provider": {
+          "id": "echo",
+          "label": ""
+        },
+        "response": {
+          "output": "What does the synthetic corpus say about pediatric dosing?",
+          "raw": "What does the synthetic corpus say about pediatric dosing?",
+          "cost": 0,
+          "cached": false,
+          "tokenUsage": {
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "total": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 0,
+              "prompt": 0,
+              "completion": 0,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "isRefusal": false,
+          "metadata": {}
+        },
+        "score": 0,
+        "success": false,
+        "testCase": {
+          "vars": {
+            "question": "What does the synthetic corpus say about pediatric dosing?"
+          },
+          "assert": [
+            {
+              "type": "icontains",
+              "value": "not in the provided documents"
+            }
+          ],
+          "metadata": {
+            "test_id": "PF-ECHO-3",
+            "requirement_id": "REQ-004"
+          },
+          "options": {}
+        },
+        "testIdx": 2,
+        "tokenUsage": {
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "total": 0,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "question": "What does the synthetic corpus say about pediatric dosing?"
+        },
+        "metadata": {
+          "test_id": "PF-ECHO-3",
+          "requirement_id": "REQ-004",
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 1
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 2,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 0,
+        "completion": 0,
+        "cached": 0,
+        "total": 0,
+        "numRequests": 3,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 0,
+          "prompt": 0,
+          "completion": 0,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "durationMs": 45,
+      "evaluationDurationMs": 45
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "p11e offline promptfoo run (echo provider, synthetic)",
+    "prompts": [
+      "{{question}}"
+    ],
+    "providers": [
+      "echo"
+    ],
+    "tests": [
+      {
+        "vars": {
+          "question": "Per Section 4.2 of the synthetic guidance, how often is the device recalibrated?"
+        },
+        "assert": [
+          {
+            "type": "icontains",
+            "value": "section"
+          }
+        ],
+        "metadata": {
+          "test_id": "PF-ECHO-1",
+          "requirement_id": "REQ-001"
+        }
+      },
+      {
+        "vars": {
+          "question": "What is the recalibration interval for the synthetic device?"
+        },
+        "assert": [
+          {
+            "type": "icontains",
+            "value": "section"
+          }
+        ],
+        "metadata": {
+          "test_id": "PF-ECHO-2",
+          "requirement_id": "REQ-001"
+        }
+      },
+      {
+        "vars": {
+          "question": "What does the synthetic corpus say about pediatric dosing?"
+        },
+        "assert": [
+          {
+            "type": "icontains",
+            "value": "not in the provided documents"
+          }
+        ],
+        "metadata": {
+          "test_id": "PF-ECHO-3",
+          "requirement_id": "REQ-004"
+        }
+      }
+    ],
+    "env": {},
+    "sharing": false,
+    "outputPath": [
+      "../part11-eval-evidence/examples/promptfoo_echo_run/results.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {},
+    "basePath": "/workspace/github-profile/part11-eval-evidence/examples/promptfoo_echo_run"
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.125.1",
+    "nodeVersion": "v24.22.1",
+    "platform": "linux",
+    "arch": "x64",
+    "exportedAt": "2026-11-11T20:47:48.315Z",
+    "evaluationCreatedAt": "2026-11-11T20:47:48.204Z"
+  },
+  "vars": [
+    "question"
+  ],
+  "runtimeOptions": {
+    "eventSource": "cli",
+    "showProgressBar": true,
+    "repeat": 1,
+    "maxConcurrency": 4,
+    "cache": false
+  }
+}

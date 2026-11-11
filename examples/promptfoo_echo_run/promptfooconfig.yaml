@@ -1,0 +1,33 @@
+# SYNTHETIC EXAMPLE - fabricated demo data, not a real system.
+# The `echo` provider returns the rendered prompt unchanged, so no API is called
+# and pass/fail only reflects whether the synthetic question text matches the assertion.
+description: p11e offline promptfoo run (echo provider, synthetic)
+prompts:
+  - "{{question}}"
+providers:
+  - echo
+tests:
+  - vars:
+      question: "Per Section 4.2 of the synthetic guidance, how often is the device recalibrated?"
+    assert:
+      - type: icontains
+        value: "section"
+    metadata:
+      test_id: PF-ECHO-1
+      requirement_id: REQ-001
+  - vars:
+      question: "What is the recalibration interval for the synthetic device?"
+    assert:
+      - type: icontains
+        value: "section"
+    metadata:
+      test_id: PF-ECHO-2
+      requirement_id: REQ-001
+  - vars:
+      question: "What does the synthetic corpus say about pediatric dosing?"
+    assert:
+      - type: icontains
+        value: "not in the provided documents"
+    metadata:
+      test_id: PF-ECHO-3
+      requirement_id: REQ-004

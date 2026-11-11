@@ -497,3 +497,19 @@ def test_build_from_real_inspect_mockllm_log(tmp_path):
     assert r["meta"]["n_tests"] == 3
     assert "Test SYN-2 (REQ-004): verdict FAIL" in r["deviations"]
     assert "Requirement REQ-002: NOT TESTED" in r["deviations"]
+
+
+ECHO_RUN = Path(__file__).parent.parent / "examples" / "promptfoo_echo_run" / "results.json"
+
+
+def test_build_from_real_promptfoo_echo_export(tmp_path):
+    # Unedited `promptfoo eval -o results.json` (promptfoo 0.125.1, echo provider).
+    # Real exports put the assertion message in `error` with failureReason 1: that is a FAIL.
+    recs = load_results(ECHO_RUN, fmt="promptfoo")
+    assert [r["test_id"] for r in recs] == ["PF-ECHO-1", "PF-ECHO-2", "PF-ECHO-3"]
+    assert [r["verdict"] for r in recs] == ["pass", "fail", "fail"]
+    assert [r["requirement_id"] for r in recs] == ["REQ-001", "REQ-001", "REQ-004"]
+    r = build(ECHO_RUN, EX / "requirements.yaml", tmp_path, fmt="promptfoo",
+              run_id="pf-echo-test", now="2026-01-01T00:00:00Z")
+    assert r["meta"]["n_tests"] == 3
+    assert "Test PF-ECHO-2 (REQ-001): verdict FAIL" in r["deviations"]
