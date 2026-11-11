@@ -36,12 +36,15 @@ p11e verify out/run_log.jsonl --expect-head-file run-42.head   # same check, has
 
 Other inputs: `--format promptfoo` reads promptfoo `-o results.json` (version 3) or
 `-o results.jsonl`; put `requirement_id`/`test_id` in each test's `metadata`. Provider errors
-become `verdict=error`, and rows with no `test_id` get a stable `pf-t<testIdx>-p<promptIdx>` id.
+(`failureReason: 2`) become `verdict=error`; an assertion failure stays `fail` even though
+promptfoo also writes its message to `error`. Rows with no `test_id` get a stable `pf-t<testIdx>-p<promptIdx>` id.
 When one test runs against several prompts or providers, its repeated `test_id` gets a
 `/p<promptIdx>` suffix per column; any other duplicate `test_id` is rejected.
 JSONL rows carry no run timestamp, so prefer the JSON export for the audit trail. Fixtures in
 [`examples/promptfoo_synthetic/`](examples/promptfoo_synthetic/) are hand-written synthetic
-rows in promptfoo's export shape, not output from a real run. `--format deepeval` reads a
+rows in promptfoo's export shape, not output from a real run;
+[`examples/promptfoo_echo_run/`](examples/promptfoo_echo_run/) is an unedited export from a real
+offline run with promptfoo's `echo` provider (synthetic questions, no API). `--format deepeval` reads a
 DeepEval test-run object (`testCases`, camelCase) or a bare list of test cases (snake_case); put
 `requirement_id`/`test_id`/`model` in `additional_metadata`. A metric error becomes
 `verdict=error` and `score` is the lowest metric score. The fixture in
