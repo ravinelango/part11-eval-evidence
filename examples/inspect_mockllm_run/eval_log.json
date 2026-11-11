@@ -1,0 +1,1265 @@
+{
+  "version": 2,
+  "status": "success",
+  "eval": {
+    "eval_id": "3Uw6FCYfjkVM4c4xWsjtKC",
+    "run_id": "JEiCwNeVSQE83utNCv6NzK",
+    "created": "2026-11-11T00:45:16+00:00",
+    "task": "synthetic_smoke",
+    "task_id": "YcLzhYHDYFi7ahpkeaeNdQ",
+    "task_version": 0,
+    "task_file": "task.py",
+    "task_display_name": "synthetic_smoke",
+    "task_registry_name": "synthetic_smoke",
+    "task_attribs": {},
+    "task_args": {},
+    "task_args_passed": {},
+    "dataset": {
+      "samples": 3,
+      "sample_ids": [
+        "SYN-1",
+        "SYN-2",
+        "SYN-3"
+      ],
+      "shuffled": false
+    },
+    "model": "mockllm/model",
+    "model_generate_config": {},
+    "model_args": {},
+    "config": {
+      "epochs": 1,
+      "fail_on_error": true,
+      "continue_on_fail": false,
+      "score_on_error": false,
+      "sandbox_cleanup": true,
+      "sandbox_prebuilt": false,
+      "log_samples": true,
+      "log_realtime": true,
+      "log_images": true,
+      "log_shared": 0,
+      "score_display": true
+    },
+    "packages": {
+      "inspect_ai": "0.3.289"
+    },
+    "scorers": [
+      {
+        "name": "includes",
+        "options": {},
+        "metrics": [
+          {
+            "name": "inspect_ai/accuracy",
+            "options": {}
+          },
+          {
+            "name": "inspect_ai/stderr",
+            "options": {}
+          }
+        ],
+        "metadata": {}
+      }
+    ]
+  },
+  "plan": {
+    "name": "plan",
+    "steps": [
+      {
+        "solver": "generate",
+        "params": {
+          "tool_calls": "loop"
+        },
+        "params_passed": {}
+      }
+    ],
+    "config": {}
+  },
+  "results": {
+    "total_samples": 3,
+    "completed_samples": 3,
+    "scores": [
+      {
+        "name": "includes",
+        "scorer": "includes",
+        "scored_samples": 3,
+        "unscored_samples": 0,
+        "params": {},
+        "metrics": {
+          "accuracy": {
+            "name": "accuracy",
+            "value": 0.3333333333333333,
+            "params": {}
+          },
+          "stderr": {
+            "name": "stderr",
+            "value": 0.33333333333333337,
+            "params": {}
+          }
+        }
+      }
+    ],
+    "headline": {
+      "scorer": "includes",
+      "score": "includes",
+      "metric": "accuracy"
+    }
+  },
+  "stats": {
+    "started_at": "2026-11-11T00:45:16+00:00",
+    "completed_at": "2026-11-11T00:45:17+00:00",
+    "model_usage": {
+      "mockllm/model": {
+        "input_tokens": 27,
+        "output_tokens": 99,
+        "total_tokens": 126
+      }
+    },
+    "role_usage": {},
+    "connection_limit_history": []
+  },
+  "invalidated": false,
+  "tags": [],
+  "metadata": {},
+  "samples": [
+    {
+      "id": "SYN-1",
+      "epoch": 1,
+      "input": "Reply with the words: Default output from mockllm/model",
+      "target": "Default output from mockllm/model",
+      "messages": [
+        {
+          "id": "87uDG2nPo7NrbXFjbnyVaA",
+          "content": "Reply with the words: Default output from mockllm/model",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "AhDwh48wER3D5VCum5M4Ap",
+          "content": "Default output from mockllm/model",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm"
+        }
+      ],
+      "output": {
+        "model": "mockllm",
+        "choices": [
+          {
+            "message": {
+              "id": "AhDwh48wER3D5VCum5M4Ap",
+              "content": "Default output from mockllm/model",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "Default output from mockllm/model",
+        "usage": {
+          "input_tokens": 13,
+          "output_tokens": 33,
+          "total_tokens": 46
+        },
+        "input_context_tokens": 13,
+        "time": 0.2582694770244416
+      },
+      "scores": {
+        "includes": {
+          "value": "C",
+          "answer": "default output from mockllm/model",
+          "explanation": "Default output from mockllm/model",
+          "history": []
+        }
+      },
+      "metadata": {
+        "requirement_id": "REQ-001"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "aJvJoyWc3HeqEmf63bZuFC",
+          "span_id": "DzdBq537engaV5HUB3FEgo",
+          "timestamp": "2026-11-11T00:45:16.650911+00:00",
+          "working_start": 147638.462504515,
+          "event": "span_begin",
+          "id": "DzdBq537engaV5HUB3FEgo",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "SLuHERPupHbUvUpSfRMkaM",
+          "span_id": "DzdBq537engaV5HUB3FEgo",
+          "timestamp": "2026-11-11T00:45:16.651732+00:00",
+          "working_start": 147638.463325642,
+          "event": "sample_init",
+          "sample": {
+            "input": "Reply with the words: Default output from mockllm/model",
+            "target": "Default output from mockllm/model",
+            "id": "SYN-1",
+            "metadata": {
+              "requirement_id": "REQ-001"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "87uDG2nPo7NrbXFjbnyVaA",
+                "content": "Reply with the words: Default output from mockllm/model",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "requirement_id": "REQ-001"
+            }
+          }
+        },
+        {
+          "uuid": "SsbHg9dmPvaitaFp226Uoc",
+          "span_id": "DzdBq537engaV5HUB3FEgo",
+          "timestamp": "2026-11-11T00:45:16.652024+00:00",
+          "working_start": 147638.463617067,
+          "event": "span_end",
+          "id": "DzdBq537engaV5HUB3FEgo"
+        },
+        {
+          "uuid": "c5kRQbF73LXkoowhQNxQgC",
+          "span_id": "kgfT3sX2t3pAcPSVnDrjnb",
+          "timestamp": "2026-11-11T00:45:16.655622+00:00",
+          "working_start": 0.003373454004758969,
+          "event": "span_begin",
+          "id": "kgfT3sX2t3pAcPSVnDrjnb",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "XnYB3HjKwXugKWGEhEe6PX",
+          "span_id": "fEFJJL73fEjP3DFfdfNmWh",
+          "timestamp": "2026-11-11T00:45:16.656043+00:00",
+          "working_start": 0.0037953139981254935,
+          "event": "span_begin",
+          "id": "fEFJJL73fEjP3DFfdfNmWh",
+          "parent_id": "kgfT3sX2t3pAcPSVnDrjnb",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "ELVH7sQc5z8aRv63Y9Prs8",
+          "span_id": "fEFJJL73fEjP3DFfdfNmWh",
+          "timestamp": "2026-11-11T00:45:16.656961+00:00",
+          "working_start": 0.004713995003839955,
+          "event": "model",
+          "model": "mockllm/model",
+          "origin": "agent",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {},
+          "output": {
+            "model": "mockllm",
+            "choices": [
+              {
+                "message": {
+                  "id": "AhDwh48wER3D5VCum5M4Ap",
+                  "content": "Default output from mockllm/model",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "Default output from mockllm/model",
+            "usage": {
+              "input_tokens": 13,
+              "output_tokens": 33,
+              "total_tokens": 46
+            },
+            "input_context_tokens": 13,
+            "time": 0.2582694770244416
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "Default output from mockllm/model"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-11-11T00:45:17.039262+00:00",
+          "working_time": 0.2582694770244416
+        },
+        {
+          "uuid": "EYuzLKnH6WErEPJpHFRdhK",
+          "span_id": "fEFJJL73fEjP3DFfdfNmWh",
+          "timestamp": "2026-11-11T00:45:17.039964+00:00",
+          "working_start": 0.38624717798666097,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "AhDwh48wER3D5VCum5M4Ap",
+                "content": "Default output from mockllm/model",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 13,
+                "output_tokens": 33,
+                "total_tokens": 46
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/input_context_tokens",
+              "value": 13
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.2582694770244416
+            },
+            {
+              "op": "replace",
+              "path": "/output/model",
+              "value": "mockllm",
+              "replaced": "mockllm/model"
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "AhDwh48wER3D5VCum5M4Ap",
+                  "content": "Default output from mockllm/model",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "Default output from mockllm/model",
+              "replaced": ""
+            }
+          ]
+        },
+        {
+          "uuid": "NkKTD8eMSZt4JBv2oGm2cx",
+          "span_id": "fEFJJL73fEjP3DFfdfNmWh",
+          "timestamp": "2026-11-11T00:45:17.040352+00:00",
+          "working_start": 0.3866336010105442,
+          "event": "span_end",
+          "id": "fEFJJL73fEjP3DFfdfNmWh"
+        },
+        {
+          "uuid": "eRzsmT99LJNrWYzXypdtva",
+          "span_id": "kgfT3sX2t3pAcPSVnDrjnb",
+          "timestamp": "2026-11-11T00:45:17.040627+00:00",
+          "working_start": 0.3869078079878818,
+          "event": "span_end",
+          "id": "kgfT3sX2t3pAcPSVnDrjnb"
+        },
+        {
+          "uuid": "nQnKv68iiDCJfDs52EUGwP",
+          "span_id": "GkKJMz26qsnxpZBnQgWjTu",
+          "timestamp": "2026-11-11T00:45:17.046321+00:00",
+          "working_start": 0.39260184299200773,
+          "event": "span_begin",
+          "id": "GkKJMz26qsnxpZBnQgWjTu",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "kq6r4hhrNHXgdJmS9ckiqJ",
+          "span_id": "4h3j3S6Bf3VPJzY5nJVirg",
+          "timestamp": "2026-11-11T00:45:17.046506+00:00",
+          "working_start": 0.3927869999897666,
+          "event": "span_begin",
+          "id": "4h3j3S6Bf3VPJzY5nJVirg",
+          "parent_id": "GkKJMz26qsnxpZBnQgWjTu",
+          "type": "scorer",
+          "name": "includes"
+        },
+        {
+          "uuid": "J3WD6tBkvQ5uivAsjA4uzR",
+          "span_id": "4h3j3S6Bf3VPJzY5nJVirg",
+          "timestamp": "2026-11-11T00:45:17.046687+00:00",
+          "working_start": 0.3929672689992003,
+          "event": "score",
+          "score": {
+            "value": "C",
+            "answer": "default output from mockllm/model",
+            "explanation": "Default output from mockllm/model",
+            "history": []
+          },
+          "target": "Default output from mockllm/model",
+          "intermediate": false,
+          "scorer": "includes",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 13,
+              "output_tokens": 33,
+              "total_tokens": 46
+            }
+          }
+        },
+        {
+          "uuid": "gkcuFxALj45wzvA6kJdegA",
+          "span_id": "4h3j3S6Bf3VPJzY5nJVirg",
+          "timestamp": "2026-11-11T00:45:17.046979+00:00",
+          "working_start": 0.39326019599684514,
+          "event": "span_end",
+          "id": "4h3j3S6Bf3VPJzY5nJVirg"
+        },
+        {
+          "uuid": "DFFiXqrS3TDdrZYRb8fv8F",
+          "span_id": "GkKJMz26qsnxpZBnQgWjTu",
+          "timestamp": "2026-11-11T00:45:17.047125+00:00",
+          "working_start": 0.3934058230079245,
+          "event": "span_end",
+          "id": "GkKJMz26qsnxpZBnQgWjTu"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 13,
+          "output_tokens": 33,
+          "total_tokens": 46
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-11-11T00:45:16.652253+00:00",
+      "completed_at": "2026-11-11T00:45:17.049194+00:00",
+      "total_time": 0.397,
+      "working_time": 0.395,
+      "uuid": "6xDbzEjPcFKvCzJPcMxHga",
+      "error_retries": [],
+      "attachments": {},
+      "events_data": {
+        "messages": [
+          {
+            "id": "87uDG2nPo7NrbXFjbnyVaA",
+            "content": "Reply with the words: Default output from mockllm/model",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "87uDG2nPo7NrbXFjbnyVaA",
+            "content": "Reply with the words: Default output from mockllm/model",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "SYN-2",
+      "epoch": 1,
+      "input": "What is 2 + 2?",
+      "target": "4",
+      "messages": [
+        {
+          "id": "5uAmMtHQRuHRFVTEEaUkV2",
+          "content": "What is 2 + 2?",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "4NC4yJwVDtfbDZk76QP9mD",
+          "content": "Default output from mockllm/model",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm"
+        }
+      ],
+      "output": {
+        "model": "mockllm",
+        "choices": [
+          {
+            "message": {
+              "id": "4NC4yJwVDtfbDZk76QP9mD",
+              "content": "Default output from mockllm/model",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "Default output from mockllm/model",
+        "usage": {
+          "input_tokens": 8,
+          "output_tokens": 33,
+          "total_tokens": 41
+        },
+        "input_context_tokens": 8,
+        "time": 0.000206707016332075
+      },
+      "scores": {
+        "includes": {
+          "value": "I",
+          "answer": "default output from mockllm/model",
+          "explanation": "Default output from mockllm/model",
+          "history": []
+        }
+      },
+      "metadata": {
+        "requirement_id": "REQ-004"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "keYNKsezw8n3Q9Ku23k22Y",
+          "span_id": "LZx3c7DefHfRHpHgdpuxTP",
+          "timestamp": "2026-11-11T00:45:16.653034+00:00",
+          "working_start": 147638.464626841,
+          "event": "span_begin",
+          "id": "LZx3c7DefHfRHpHgdpuxTP",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "j2PJxmqS3echkjYtKurHgs",
+          "span_id": "LZx3c7DefHfRHpHgdpuxTP",
+          "timestamp": "2026-11-11T00:45:16.653521+00:00",
+          "working_start": 147638.465113614,
+          "event": "sample_init",
+          "sample": {
+            "input": "What is 2 + 2?",
+            "target": "4",
+            "id": "SYN-2",
+            "metadata": {
+              "requirement_id": "REQ-004"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "5uAmMtHQRuHRFVTEEaUkV2",
+                "content": "What is 2 + 2?",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "requirement_id": "REQ-004"
+            }
+          }
+        },
+        {
+          "uuid": "HXBiMWbuTdaqYk9fmZ2spb",
+          "span_id": "LZx3c7DefHfRHpHgdpuxTP",
+          "timestamp": "2026-11-11T00:45:16.653745+00:00",
+          "working_start": 147638.465337462,
+          "event": "span_end",
+          "id": "LZx3c7DefHfRHpHgdpuxTP"
+        },
+        {
+          "uuid": "PF5ZaMtDLD3VYCjJnLPf7U",
+          "span_id": "8sjLwZEq6iBHLNEPDtD9PU",
+          "timestamp": "2026-11-11T00:45:16.657152+00:00",
+          "working_start": 0.0032014470198191702,
+          "event": "span_begin",
+          "id": "8sjLwZEq6iBHLNEPDtD9PU",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "QTCgQjmMawzLrifRKQH9dM",
+          "span_id": "aeFGThBRFGm75duuVaixHd",
+          "timestamp": "2026-11-11T00:45:16.657419+00:00",
+          "working_start": 0.003469196002697572,
+          "event": "span_begin",
+          "id": "aeFGThBRFGm75duuVaixHd",
+          "parent_id": "8sjLwZEq6iBHLNEPDtD9PU",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "L7urnmD6xRR5F6wNYUp78A",
+          "span_id": "aeFGThBRFGm75duuVaixHd",
+          "timestamp": "2026-11-11T00:45:16.657762+00:00",
+          "working_start": 0.003812575014308095,
+          "event": "model",
+          "model": "mockllm/model",
+          "origin": "agent",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {},
+          "output": {
+            "model": "mockllm",
+            "choices": [
+              {
+                "message": {
+                  "id": "4NC4yJwVDtfbDZk76QP9mD",
+                  "content": "Default output from mockllm/model",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "Default output from mockllm/model",
+            "usage": {
+              "input_tokens": 8,
+              "output_tokens": 33,
+              "total_tokens": 41
+            },
+            "input_context_tokens": 8,
+            "time": 0.000206707016332075
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "Default output from mockllm/model"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-11-11T00:45:17.042850+00:00",
+          "working_time": 0.000206707016332075
+        },
+        {
+          "uuid": "np7NeQNG5faaounsa5JmXL",
+          "span_id": "aeFGThBRFGm75duuVaixHd",
+          "timestamp": "2026-11-11T00:45:17.043208+00:00",
+          "working_start": 0.006113823008490726,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "4NC4yJwVDtfbDZk76QP9mD",
+                "content": "Default output from mockllm/model",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 8,
+                "output_tokens": 33,
+                "total_tokens": 41
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/input_context_tokens",
+              "value": 8
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.000206707016332075
+            },
+            {
+              "op": "replace",
+              "path": "/output/model",
+              "value": "mockllm",
+              "replaced": "mockllm/model"
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "4NC4yJwVDtfbDZk76QP9mD",
+                  "content": "Default output from mockllm/model",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "Default output from mockllm/model",
+              "replaced": ""
+            }
+          ]
+        },
+        {
+          "uuid": "4h8j9oHhFUqgJegeWjxbkG",
+          "span_id": "aeFGThBRFGm75duuVaixHd",
+          "timestamp": "2026-11-11T00:45:17.043431+00:00",
+          "working_start": 0.006336392019875348,
+          "event": "span_end",
+          "id": "aeFGThBRFGm75duuVaixHd"
+        },
+        {
+          "uuid": "czNDbykMLx52GUSX8RQF64",
+          "span_id": "8sjLwZEq6iBHLNEPDtD9PU",
+          "timestamp": "2026-11-11T00:45:17.043588+00:00",
+          "working_start": 0.006493300024885684,
+          "event": "span_end",
+          "id": "8sjLwZEq6iBHLNEPDtD9PU"
+        },
+        {
+          "uuid": "h7eGotRxpPqVMeEHwgR4QR",
+          "span_id": "9fbNJMJN5AyJrG4XWz7Dqw",
+          "timestamp": "2026-11-11T00:45:17.047451+00:00",
+          "working_start": 0.010356183018302545,
+          "event": "span_begin",
+          "id": "9fbNJMJN5AyJrG4XWz7Dqw",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "gCxGsCd9PH5LQHngND9eEB",
+          "span_id": "iiRrxGZsA6Xisiy4Va2WLA",
+          "timestamp": "2026-11-11T00:45:17.047611+00:00",
+          "working_start": 0.01051620501675643,
+          "event": "span_begin",
+          "id": "iiRrxGZsA6Xisiy4Va2WLA",
+          "parent_id": "9fbNJMJN5AyJrG4XWz7Dqw",
+          "type": "scorer",
+          "name": "includes"
+        },
+        {
+          "uuid": "MKB9ZvHH9yj7dzxGM8Rees",
+          "span_id": "iiRrxGZsA6Xisiy4Va2WLA",
+          "timestamp": "2026-11-11T00:45:17.047780+00:00",
+          "working_start": 0.010684916022000834,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "default output from mockllm/model",
+            "explanation": "Default output from mockllm/model",
+            "history": []
+          },
+          "target": "4",
+          "intermediate": false,
+          "scorer": "includes",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 8,
+              "output_tokens": 33,
+              "total_tokens": 41
+            }
+          }
+        },
+        {
+          "uuid": "JehYxXXeCmNg6CXn2frk6C",
+          "span_id": "iiRrxGZsA6Xisiy4Va2WLA",
+          "timestamp": "2026-11-11T00:45:17.047920+00:00",
+          "working_start": 0.010824613011209294,
+          "event": "span_end",
+          "id": "iiRrxGZsA6Xisiy4Va2WLA"
+        },
+        {
+          "uuid": "KJPJZDVHGZX7V7C4AKCXfC",
+          "span_id": "9fbNJMJN5AyJrG4XWz7Dqw",
+          "timestamp": "2026-11-11T00:45:17.048034+00:00",
+          "working_start": 0.01093857700470835,
+          "event": "span_end",
+          "id": "9fbNJMJN5AyJrG4XWz7Dqw"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 8,
+          "output_tokens": 33,
+          "total_tokens": 41
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-11-11T00:45:16.653953+00:00",
+      "completed_at": "2026-11-11T00:45:17.050467+00:00",
+      "total_time": 0.396,
+      "working_time": 0.013,
+      "uuid": "3UDQ8VcZsXMJztnyTJa2Zt",
+      "error_retries": [],
+      "attachments": {},
+      "events_data": {
+        "messages": [
+          {
+            "id": "5uAmMtHQRuHRFVTEEaUkV2",
+            "content": "What is 2 + 2?",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "5uAmMtHQRuHRFVTEEaUkV2",
+            "content": "What is 2 + 2?",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    },
+    {
+      "id": "SYN-3",
+      "epoch": 1,
+      "input": "Name the capital of France.",
+      "target": "Paris",
+      "messages": [
+        {
+          "id": "3VaEDZCoUsxjXQ2YusgdE7",
+          "content": "Name the capital of France.",
+          "source": "input",
+          "role": "user"
+        },
+        {
+          "id": "PwpgABLZAMyY4zojr4jgM6",
+          "content": "Default output from mockllm/model",
+          "source": "generate",
+          "role": "assistant",
+          "model": "mockllm"
+        }
+      ],
+      "output": {
+        "model": "mockllm",
+        "choices": [
+          {
+            "message": {
+              "id": "PwpgABLZAMyY4zojr4jgM6",
+              "content": "Default output from mockllm/model",
+              "source": "generate",
+              "role": "assistant",
+              "model": "mockllm"
+            },
+            "stop_reason": "stop"
+          }
+        ],
+        "completion": "Default output from mockllm/model",
+        "usage": {
+          "input_tokens": 6,
+          "output_tokens": 33,
+          "total_tokens": 39
+        },
+        "input_context_tokens": 6,
+        "time": 0.00012179400073364377
+      },
+      "scores": {
+        "includes": {
+          "value": "I",
+          "answer": "default output from mockllm/model",
+          "explanation": "Default output from mockllm/model",
+          "history": []
+        }
+      },
+      "metadata": {
+        "requirement_id": "REQ-004"
+      },
+      "store": {},
+      "events": [
+        {
+          "uuid": "dNJZ2dUkvb2WiipCzU4gUQ",
+          "span_id": "hwzq5uWEDbmL7axepgy84F",
+          "timestamp": "2026-11-11T00:45:16.654467+00:00",
+          "working_start": 147638.466059157,
+          "event": "span_begin",
+          "id": "hwzq5uWEDbmL7axepgy84F",
+          "type": "init",
+          "name": "init"
+        },
+        {
+          "uuid": "NqKEnCouvxYhVnNXLdBPF4",
+          "span_id": "hwzq5uWEDbmL7axepgy84F",
+          "timestamp": "2026-11-11T00:45:16.654946+00:00",
+          "working_start": 147638.466538929,
+          "event": "sample_init",
+          "sample": {
+            "input": "Name the capital of France.",
+            "target": "Paris",
+            "id": "SYN-3",
+            "metadata": {
+              "requirement_id": "REQ-004"
+            }
+          },
+          "state": {
+            "messages": [
+              {
+                "id": "3VaEDZCoUsxjXQ2YusgdE7",
+                "content": "Name the capital of France.",
+                "source": "input",
+                "role": "user"
+              }
+            ],
+            "tools": [],
+            "tool_choice": null,
+            "store": {},
+            "output": {
+              "model": "mockllm/model",
+              "choices": [],
+              "completion": ""
+            },
+            "completed": false,
+            "metadata": {
+              "requirement_id": "REQ-004"
+            }
+          }
+        },
+        {
+          "uuid": "RapHzmnqKKnCd5YbDxH7FY",
+          "span_id": "hwzq5uWEDbmL7axepgy84F",
+          "timestamp": "2026-11-11T00:45:16.655156+00:00",
+          "working_start": 147638.466748482,
+          "event": "span_end",
+          "id": "hwzq5uWEDbmL7axepgy84F"
+        },
+        {
+          "uuid": "8XRvf9AExDJKbe4GJXS2Mw",
+          "span_id": "Y9yw77nqHxXzDEZCdwAXUS",
+          "timestamp": "2026-11-11T00:45:16.657919+00:00",
+          "working_start": 0.00260765798157081,
+          "event": "span_begin",
+          "id": "Y9yw77nqHxXzDEZCdwAXUS",
+          "type": "solvers",
+          "name": "solvers"
+        },
+        {
+          "uuid": "5cxsysTiXr3BBG2rjKog3n",
+          "span_id": "9i5HE8HYYoaSGX5cP4oBvD",
+          "timestamp": "2026-11-11T00:45:16.658125+00:00",
+          "working_start": 0.0028138469788245857,
+          "event": "span_begin",
+          "id": "9i5HE8HYYoaSGX5cP4oBvD",
+          "parent_id": "Y9yw77nqHxXzDEZCdwAXUS",
+          "type": "solver",
+          "name": "generate"
+        },
+        {
+          "uuid": "8EKnzrusonZbexLvNQbzzi",
+          "span_id": "9i5HE8HYYoaSGX5cP4oBvD",
+          "timestamp": "2026-11-11T00:45:16.658383+00:00",
+          "working_start": 0.0030718740017618984,
+          "event": "model",
+          "model": "mockllm/model",
+          "origin": "agent",
+          "input": [],
+          "input_refs": [
+            [
+              0,
+              1
+            ]
+          ],
+          "tools": [],
+          "tool_choice": "none",
+          "config": {},
+          "output": {
+            "model": "mockllm",
+            "choices": [
+              {
+                "message": {
+                  "id": "PwpgABLZAMyY4zojr4jgM6",
+                  "content": "Default output from mockllm/model",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm"
+                },
+                "stop_reason": "stop"
+              }
+            ],
+            "completion": "Default output from mockllm/model",
+            "usage": {
+              "input_tokens": 6,
+              "output_tokens": 33,
+              "total_tokens": 39
+            },
+            "input_context_tokens": 6,
+            "time": 0.00012179400073364377
+          },
+          "call": {
+            "request": {
+              "model": "model"
+            },
+            "response": {
+              "content": "Default output from mockllm/model"
+            },
+            "call_refs": [
+              [
+                0,
+                1
+              ]
+            ],
+            "call_key": "messages"
+          },
+          "completed": "2026-11-11T00:45:17.045175+00:00",
+          "working_time": 0.00012179400073364377
+        },
+        {
+          "uuid": "HSnsPN28eqkcmv3uiMmphg",
+          "span_id": "9i5HE8HYYoaSGX5cP4oBvD",
+          "timestamp": "2026-11-11T00:45:17.045508+00:00",
+          "working_start": 0.004790483973920345,
+          "event": "state",
+          "changes": [
+            {
+              "op": "add",
+              "path": "/messages/1",
+              "value": {
+                "id": "PwpgABLZAMyY4zojr4jgM6",
+                "content": "Default output from mockllm/model",
+                "source": "generate",
+                "role": "assistant",
+                "model": "mockllm"
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/usage",
+              "value": {
+                "input_tokens": 6,
+                "output_tokens": 33,
+                "total_tokens": 39
+              }
+            },
+            {
+              "op": "add",
+              "path": "/output/input_context_tokens",
+              "value": 6
+            },
+            {
+              "op": "add",
+              "path": "/output/time",
+              "value": 0.00012179400073364377
+            },
+            {
+              "op": "replace",
+              "path": "/output/model",
+              "value": "mockllm",
+              "replaced": "mockllm/model"
+            },
+            {
+              "op": "add",
+              "path": "/output/choices/0",
+              "value": {
+                "message": {
+                  "id": "PwpgABLZAMyY4zojr4jgM6",
+                  "content": "Default output from mockllm/model",
+                  "source": "generate",
+                  "role": "assistant",
+                  "model": "mockllm"
+                },
+                "stop_reason": "stop"
+              }
+            },
+            {
+              "op": "replace",
+              "path": "/output/completion",
+              "value": "Default output from mockllm/model",
+              "replaced": ""
+            }
+          ]
+        },
+        {
+          "uuid": "cnKMHhCQpQUVqgCcUGxur5",
+          "span_id": "9i5HE8HYYoaSGX5cP4oBvD",
+          "timestamp": "2026-11-11T00:45:17.045708+00:00",
+          "working_start": 0.004990455985534936,
+          "event": "span_end",
+          "id": "9i5HE8HYYoaSGX5cP4oBvD"
+        },
+        {
+          "uuid": "EaaHGriHQcysTZAxuVpuD4",
+          "span_id": "Y9yw77nqHxXzDEZCdwAXUS",
+          "timestamp": "2026-11-11T00:45:17.045860+00:00",
+          "working_start": 0.005141400964930654,
+          "event": "span_end",
+          "id": "Y9yw77nqHxXzDEZCdwAXUS"
+        },
+        {
+          "uuid": "E2XRjiupYBLhhv54vjRZFA",
+          "span_id": "BDGQdB5cncYa8YpJCBA5tU",
+          "timestamp": "2026-11-11T00:45:17.048297+00:00",
+          "working_start": 0.0075794079748447984,
+          "event": "span_begin",
+          "id": "BDGQdB5cncYa8YpJCBA5tU",
+          "type": "scorers",
+          "name": "scorers"
+        },
+        {
+          "uuid": "HYVtDDkzgncHB4HQAqk9dU",
+          "span_id": "2mARNCdSNzAW8ibhRuStua",
+          "timestamp": "2026-11-11T00:45:17.048490+00:00",
+          "working_start": 0.0077719979744870216,
+          "event": "span_begin",
+          "id": "2mARNCdSNzAW8ibhRuStua",
+          "parent_id": "BDGQdB5cncYa8YpJCBA5tU",
+          "type": "scorer",
+          "name": "includes"
+        },
+        {
+          "uuid": "mZkeNSrdUHvEPVZ6YLdv7U",
+          "span_id": "2mARNCdSNzAW8ibhRuStua",
+          "timestamp": "2026-11-11T00:45:17.048638+00:00",
+          "working_start": 0.0079192649864126,
+          "event": "score",
+          "score": {
+            "value": "I",
+            "answer": "default output from mockllm/model",
+            "explanation": "Default output from mockllm/model",
+            "history": []
+          },
+          "target": "Paris",
+          "intermediate": false,
+          "scorer": "includes",
+          "scorer_args": {},
+          "model_usage": {
+            "mockllm/model": {
+              "input_tokens": 6,
+              "output_tokens": 33,
+              "total_tokens": 39
+            }
+          }
+        },
+        {
+          "uuid": "FHwxT4DVc8hzWKNb6QoTc5",
+          "span_id": "2mARNCdSNzAW8ibhRuStua",
+          "timestamp": "2026-11-11T00:45:17.048787+00:00",
+          "working_start": 0.008068090974120423,
+          "event": "span_end",
+          "id": "2mARNCdSNzAW8ibhRuStua"
+        },
+        {
+          "uuid": "L4tRQSqNRECAu2xPg7FEt8",
+          "span_id": "BDGQdB5cncYa8YpJCBA5tU",
+          "timestamp": "2026-11-11T00:45:17.048907+00:00",
+          "working_start": 0.008188306965166703,
+          "event": "span_end",
+          "id": "BDGQdB5cncYa8YpJCBA5tU"
+        }
+      ],
+      "model_usage": {
+        "mockllm/model": {
+          "input_tokens": 6,
+          "output_tokens": 33,
+          "total_tokens": 39
+        }
+      },
+      "role_usage": {},
+      "started_at": "2026-11-11T00:45:16.655313+00:00",
+      "completed_at": "2026-11-11T00:45:17.051285+00:00",
+      "total_time": 0.396,
+      "working_time": 0.011,
+      "uuid": "VLpVndvXV3KmRG5YeRZF4y",
+      "error_retries": [],
+      "attachments": {},
+      "events_data": {
+        "messages": [
+          {
+            "id": "3VaEDZCoUsxjXQ2YusgdE7",
+            "content": "Name the capital of France.",
+            "source": "input",
+            "role": "user"
+          }
+        ],
+        "calls": [
+          {
+            "id": "3VaEDZCoUsxjXQ2YusgdE7",
+            "content": "Name the capital of France.",
+            "source": "input",
+            "metadata": null,
+            "role": "user",
+            "tool_call_id": null
+          }
+        ]
+      },
+      "turn_count": 1
+    }
+  ],
+  "reductions": [
+    {
+      "scorer": "includes",
+      "samples": [
+        {
+          "value": 1.0,
+          "answer": "default output from mockllm/model",
+          "explanation": "Default output from mockllm/model",
+          "history": [],
+          "sample_id": "SYN-1"
+        },
+        {
+          "value": 0.0,
+          "answer": "default output from mockllm/model",
+          "explanation": "Default output from mockllm/model",
+          "history": [],
+          "sample_id": "SYN-2"
+        },
+        {
+          "value": 0.0,
+          "answer": "default output from mockllm/model",
+          "explanation": "Default output from mockllm/model",
+          "history": [],
+          "sample_id": "SYN-3"
+        }
+      ]
+    }
+  ]
+}
