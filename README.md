@@ -29,7 +29,7 @@ p11e build --results examples/synthetic_run/results.jsonl \
            --dispositions examples/synthetic_run/dispositions.yaml \
            --operator "your.name" --out out   # exit 2 if an input file is missing
 p11e verify out/run_log.jsonl          # exit 0 = chain intact, 1 = tamper detected, 2 = missing log or bad --expect-head
-p11e head out/run_log.jsonl            # print the chain head to record outside the repo
+p11e head out/run_log.jsonl            # verify, then print the chain head to record outside the repo
 p11e verify out/run_log.jsonl --expect-head <recorded-sha256>
 p11e verify out/run_log.jsonl --expect-head-file run-42.head   # same check, hash read from a file
 ```

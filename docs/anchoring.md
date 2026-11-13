@@ -15,7 +15,10 @@ p11e build ... --out out
 p11e head out/run_log.jsonl
 ```
 
-`p11e head` prints one 64-character SHA-256 value. The same value is in
+`p11e head` verifies the chain first and prints one 64-character SHA-256 value. If the
+log already fails verification it prints the problems to stderr and exits `1` instead, so
+a tampered log can't be anchored as good by accident. `--no-verify` prints the last
+entry's hash anyway (useful for forensics, not for anchoring). The same value is in
 `out/manifest.json` under `meta.chain_head`, but the manifest lives next to the log, so it
 doesn't count as an independent record.
 
