@@ -41,6 +41,8 @@ def main(argv=None) -> int:
                    help="read the recorded chain head from the first non-blank line of PATH")
     h = sub.add_parser("head", help="print the chain head hash to record externally")
     h.add_argument("log")
+    h.add_argument("--no-verify", action="store_true",
+                   help="print the last entry's hash even if the chain does not verify")
     a = p.parse_args(argv)
 
     if a.cmd == "build":
@@ -73,6 +75,14 @@ def main(argv=None) -> int:
         print(f"No such log file: {a.log}", file=sys.stderr)
         return 2
     if a.cmd == "head":
+        if not a.no_verify:
+            ok, problems = verify_chain(a.log)
+            if not ok:
+                # Anchoring the head of a broken chain would record a tampered log as good.
+                print(f"Not printing a head: {a.log} fails verification:", file=sys.stderr)
+                for prob in problems:
+                    print(f"  - {prob}", file=sys.stderr)
+                return 1
         head = read_head(a.log)
         if head is None:
             print(f"No chain head: {a.log} is empty or unreadable", file=sys.stderr)

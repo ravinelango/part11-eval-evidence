@@ -118,6 +118,18 @@ def test_cli_head_and_expect_head(tmp_path, capsys):
     assert main(["verify", log, "--expect-head", "0" * 64]) == 1
 
 
+def test_cli_head_refuses_broken_chain(tmp_path, capsys):
+    _build(tmp_path)
+    log = tmp_path / "run_log.jsonl"
+    log.write_text(log.read_text().replace('"verdict":"fail"', '"verdict":"pass"'))
+    assert main(["head", str(log)]) == 1
+    err = capsys.readouterr()
+    assert err.out == "" and "fails verification" in err.err
+    # --no-verify still prints the last entry's hash (e.g. for forensics).
+    assert main(["head", str(log), "--no-verify"]) == 0
+    assert len(capsys.readouterr().out.strip()) == 64
+
+
 def test_cli_missing_log_and_bad_anchor(tmp_path, capsys):
     missing = str(tmp_path / "nope.jsonl")
     assert main(["verify", missing]) == 2
