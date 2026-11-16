@@ -18,7 +18,7 @@ single eval run. Use this plan (or your site template) for that step.
 - Installation of a pinned release or commit of `part11-eval-evidence`
 - Correct packaging of native JSONL, promptfoo, and judge-calibration-kit inputs
   into the documented artifacts
-- Integrity checks (`p11e verify`, optional `--expect-head`)
+- Integrity checks (`p11e verify`, optional `--expect-head`, `p11e check-manifest`)
 - Traceability (requirement → test → result) and disposition wiring
 
 **Out of scope**
@@ -45,7 +45,7 @@ Purpose: show the installed build matches what you intended to qualify.
 | IQ-1 | Record git commit SHA (or release tag), `p11e --version`, and `pip show` / lockfile hashes | SHA and package version match the approved build | Screenshot or log attached to the report |
 | IQ-2 | Confirm Python version is in the supported set (see CI / `pyproject.toml`) | Version matches the matrix you approved | `python --version` log |
 | IQ-3 | Install with the documented command (`pip install -e ".[dev]"` or pinned wheel) | `p11e --help` exits 0 | Command transcript |
-| IQ-4 | Confirm required entry points resolve (`p11e build`, `verify`, `head`) | Each prints help or usage without import errors | Transcript |
+| IQ-4 | Confirm required entry points resolve (`p11e build`, `verify`, `head`, `check-manifest`) | Each prints help or usage without import errors | Transcript |
 
 ## Operational qualification (OQ)
 
@@ -70,6 +70,7 @@ The repository's synthetic fixtures are labeled as such:
 | OQ-7 | Build with `--format promptfoo` on a synthetic fixture | Rows map; provider errors become `verdict=error` where seeded | Transcript |
 | OQ-8 | Build with `--format jck` on a synthetic jck summary | Kappa vs `--min-kappa` drives pass/fail; missing kappa → error | Transcript |
 | OQ-9 | Run the project's automated tests (`ruff check` + `pytest`) on the qualified build | All tests pass on the pinned commit | CI link or local transcript |
+| OQ-10 | `p11e check-manifest out` on the OQ-1 output, then again after editing one byte of a copied artifact and after deleting one | Exit 0 on the untouched output; exit 1 naming the changed and the missing file | Transcripts |
 
 Automated tests in `tests/` are **candidates** for OQ evidence when executed on
 the same pinned build under change control. Passing CI on `main` is not by itself
@@ -103,6 +104,7 @@ may reuse this tool's disposition file shape for consistency, or your QMS form.
 |---|---|
 | Native build + chain verify | `tests/test_core.py` build/verify cases |
 | Tamper detection | verify failure cases in the same module |
+| Manifest re-check | `check-manifest` test in `tests/test_core.py` |
 | promptfoo import | promptfoo fixture tests |
 | jck import | jck summary tests |
 | Dispositions in summary | disposition wiring tests |
