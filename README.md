@@ -32,6 +32,7 @@ p11e verify out/run_log.jsonl          # exit 0 = chain intact, 1 = tamper detec
 p11e head out/run_log.jsonl            # verify, then print the chain head to record outside the repo
 p11e verify out/run_log.jsonl --expect-head <recorded-sha256>
 p11e verify out/run_log.jsonl --expect-head-file run-42.head   # same check, hash read from a file
+p11e check-manifest out                # exit 0 = artifacts match manifest.json, 1 = changed or missing, 2 = no/bad manifest
 ```
 
 Other inputs: `--format promptfoo` reads promptfoo `-o results.json` (version 3) or
@@ -111,7 +112,7 @@ handled. Each entry needs `deviation_id`, `description`, `root_cause`,
 | `traceability_matrix.csv` / `.md` | requirement → tests → result (PASS / FAIL / NOT TESTED / UNTRACED) |
 | `validation_summary.md` / `.html` | one-page summary: operator, time, models, config hash, results by requirement, deviations, dispositions, manual review line |
 | `dispositions.csv` / `.json` | present when `--dispositions` is supplied; root cause, disposition, approver |
-| `manifest.json` | metadata + SHA-256 of every artifact |
+| `manifest.json` | metadata + SHA-256 of every artifact (re-check with `p11e check-manifest out`) |
 
 ## Part 11 mapping
 
@@ -121,7 +122,7 @@ Clause text checked against [eCFR 21 CFR Part 11](https://www.ecfr.gov/current/t
 |---|---|---|
 | 11.10(a) | Validation; ability to discern altered records | summary, traceability matrix, `p11e verify` |
 | 11.10(b) | Human-readable and electronic copies | `.md`/`.html` + `.jsonl`/`.csv` |
-| 11.10(c) | Record protection / accurate retrieval | manifest hashes |
+| 11.10(c) | Record protection / accurate retrieval | manifest hashes, `p11e check-manifest` |
 | 11.10(e) | Time-stamped audit trails | hash-chained `run_log.jsonl` |
 | 11.10(f) | Sequencing checks | chain `seq`, start/complete events |
 | 11.10(k)(2) | Change control of documentation | config/requirements hashes |
