@@ -1,14 +1,15 @@
-"""Command line: `p11e build`, `p11e verify` and `p11e head`."""
+"""Command line: `p11e build`, `p11e verify`, `p11e head` and `p11e check-manifest`."""
 
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
 
 from . import __version__
-from .build import build
+from .build import build, file_hash
 from .chain import read_head, verify_against_anchor, verify_chain
 
 
@@ -43,7 +44,13 @@ def main(argv=None) -> int:
     h.add_argument("log")
     h.add_argument("--no-verify", action="store_true",
                    help="print the last entry's hash even if the chain does not verify")
+    c = sub.add_parser("check-manifest",
+                       help="re-hash the artifacts listed in OUT/manifest.json")
+    c.add_argument("out", help="evidence package directory written by `p11e build`")
     a = p.parse_args(argv)
+
+    if a.cmd == "check-manifest":
+        return check_manifest(Path(a.out))
 
     if a.cmd == "build":
         for flag, path in (("--results", a.results), ("--requirements", a.requirements),
@@ -118,6 +125,35 @@ def main(argv=None) -> int:
     for prob in problems:
         print(f"  - {prob}")
     return 1
+
+
+def check_manifest(out: Path) -> int:
+    """Exit 0 if every listed artifact matches its hash, 1 if any differ or are missing,
+    2 if the manifest itself is missing or unreadable."""
+    path = out / "manifest.json"
+    if not path.is_file():
+        print(f"No manifest: {path}", file=sys.stderr)
+        return 2
+    try:
+        hashes = json.loads(path.read_text(encoding="utf-8"))["sha256"]
+        items = sorted(hashes.items())
+    except (ValueError, KeyError, TypeError, AttributeError) as e:
+        print(f"Unreadable manifest {path}: {e}", file=sys.stderr)
+        return 2
+    problems = []
+    for name, want in items:
+        f = out / name
+        if not f.is_file():
+            problems.append(f"{name}: missing")
+        elif file_hash(f) != want:
+            problems.append(f"{name}: sha256 differs from manifest")
+    if problems:
+        print(f"MANIFEST MISMATCH in {out}:")
+        for prob in problems:
+            print(f"  - {prob}")
+        return 1
+    print(f"OK: {len(items)} artifacts in {out} match manifest.json")
+    return 0
 
 
 if __name__ == "__main__":

@@ -525,3 +525,20 @@ def test_build_from_real_promptfoo_echo_export(tmp_path):
               run_id="pf-echo-test", now="2026-01-01T00:00:00Z")
     assert r["meta"]["n_tests"] == 3
     assert "Test PF-ECHO-2 (REQ-001): verdict FAIL" in r["deviations"]
+
+
+def test_cli_check_manifest(tmp_path, capsys):
+    out = tmp_path / "out"
+    _build(out)
+    assert main(["check-manifest", str(out)]) == 0
+    assert "5 artifacts" in capsys.readouterr().out
+    md = out / "traceability_matrix.md"
+    md.write_text(md.read_text(encoding="utf-8") + "edited\n", encoding="utf-8")
+    (out / "validation_summary.html").unlink()
+    assert main(["check-manifest", str(out)]) == 1
+    text = capsys.readouterr().out
+    assert "traceability_matrix.md: sha256 differs" in text
+    assert "validation_summary.html: missing" in text
+    (out / "manifest.json").write_text("{not json", encoding="utf-8")
+    assert main(["check-manifest", str(out)]) == 2
+    assert main(["check-manifest", str(tmp_path / "nope")]) == 2
